@@ -1,0 +1,204 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(
+    160deg,
+    var(--green-mist) 0%,
+    var(--beige) 40%,
+    var(--yellow-soft) 100%
+  );
+  padding: 120px 24px 100px;
+}
+
+/* Decorative blobs */
+.hero__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.hero__blob--1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--green-soft), transparent 70%);
+  top: -100px;
+  left: -100px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.hero__blob--2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--yellow-soft), transparent 70%);
+  bottom: -80px;
+  right: -80px;
+  animation: float 10s ease-in-out infinite reverse;
+}
+
+/* Floating emoji deco */
+.hero__deco {
+  position: absolute;
+  font-size: 2.2rem;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.7;
+}
+
+.hero__deco--a {
+  top: 18%;
+  left: 8%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero__deco--b {
+  top: 25%;
+  right: 10%;
+  font-size: 1.8rem;
+  animation: float 7s ease-in-out infinite 1s;
+}
+
+.hero__deco--c {
+  bottom: 28%;
+  left: 12%;
+  font-size: 1.6rem;
+  animation: float 5s ease-in-out infinite 0.5s;
+}
+
+.hero__deco--d {
+  bottom: 20%;
+  right: 8%;
+  animation: float 9s ease-in-out infinite 2s;
+}
+
+/* Content */
+.hero__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero__logo-wrap {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 40px rgba(74,124,89,0.2), 0 0 0 6px var(--green-pale);
+  margin-bottom: 8px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero__logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--green-dark);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero__tagline {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 600;
+  color: var(--brown-mid);
+  letter-spacing: 0.01em;
+}
+
+.hero__sub {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+/* CTA */
+.hero__cta {
+  margin-top: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: var(--radius-pill);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn--primary {
+  background: var(--green-dark);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(74,124,89,0.3);
+}
+
+.btn--primary:hover {
+  background: var(--green-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(74,124,89,0.35);
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--green-dark);
+  color: var(--green-dark);
+}
+
+.btn--outline:hover {
+  background: var(--green-pale);
+  transform: translateY(-2px);
+}
+
+/* Wave */
+.hero__wave {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  line-height: 0;
+}
+
+.hero__wave svg {
+  width: 100%;
+  height: 80px;
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 100px 20px 80px;
+  }
+  .hero__logo-wrap {
+    width: 90px;
+    height: 90px;
+  }
+  .hero__logo {
+    width: 64px;
+    height: 64px;
+  }
+  .hero__deco {
+    font-size: 1.5rem;
+  }
+}
