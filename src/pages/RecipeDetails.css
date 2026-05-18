@@ -133,9 +133,9 @@
 
 .reaction-btn-lg:hover,
 .reaction-btn-lg.liked {
-  background: #fde8f0;
-  border-color: #d4637a;
-  color: #d4637a;
+  background: var(--green-pale);
+  border-color: var(--green-dark);
+  color: var(--green-dark);
   transform: scale(1.04);
 }
 
