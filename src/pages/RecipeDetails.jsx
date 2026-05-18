@@ -3,7 +3,7 @@ import { useParams, Link, Navigate } from 'react-router-dom'
 import { useLang } from '../context/LanguageContext'
 import { recipes } from '../data/recipes'
 import CommentSection from '../components/CommentSection'
-import { useReactions } from '../hooks/useReactions'
+import useFirebaseReactions from "../hooks/useFirebaseReactions";
 import './RecipeDetails.css'
 
 export default function RecipeDetails() {
@@ -14,7 +14,7 @@ export default function RecipeDetails() {
 
   // Hook is always called — before any conditional return
   const { likes, dislikes, liked, disliked, handleLike, handleDislike } =
-    useReactions(recipe?.id ?? 0)
+    useFirebaseReactions(recipe?.id ?? 0)
 
   if (!recipe) return <Navigate to="/recipes" replace />
 

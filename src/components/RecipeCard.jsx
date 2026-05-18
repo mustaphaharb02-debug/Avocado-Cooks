@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../context/LanguageContext'
-import { useReactions } from '../hooks/useReactions'
+import useFirebaseReactions from "../hooks/useFirebaseReactions";
 import './RecipeCard.css'
 
 export default function RecipeCard({ recipe }) {
@@ -9,7 +9,7 @@ export default function RecipeCard({ recipe }) {
   const [imgError, setImgError] = useState(false)
 
   const { likes, dislikes, liked, disliked, handleLike, handleDislike } =
-    useReactions(recipe.id)
+    useFirebaseReactions(recipe.id)
 
   const content = recipe[lang]
 
