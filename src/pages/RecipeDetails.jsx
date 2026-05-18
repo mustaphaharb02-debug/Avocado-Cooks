@@ -57,7 +57,7 @@ export default function RecipeDetails() {
               className={`reaction-btn-lg ${liked ? 'liked' : ''}`}
               onClick={handleLike}
             >
-              <span>♥</span>
+              <span>💚</span>
               <span>{likes} {t.likes}</span>
             </button>
             <button
