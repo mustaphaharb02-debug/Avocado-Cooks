@@ -1,4 +1,4 @@
-# 🥑 Avocado Cooks Website
+# 🥑 Avo Cooks Website
 
 A bilingual (English/Arabic) food recipe website built with React + Vite.
 

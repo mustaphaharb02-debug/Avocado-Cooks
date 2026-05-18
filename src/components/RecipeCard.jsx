@@ -29,7 +29,7 @@ export default function RecipeCard({ recipe }) {
           />
         ) : (
           <div className="recipe-card__img-placeholder">
-            <span>🥑</span>
+            <span className="ingredient-dot">•</span>
           </div>
         )}
         <div className="recipe-card__overlay">
@@ -53,7 +53,7 @@ export default function RecipeCard({ recipe }) {
               onClick={onLike}
               aria-label="Like"
             >
-              <span className="reaction-btn__icon">♥</span>
+              <span className="reaction-btn__icon">💚</span>
               <span>{likes}</span>
             </button>
             <button

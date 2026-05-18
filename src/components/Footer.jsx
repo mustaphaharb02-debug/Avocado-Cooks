@@ -10,7 +10,7 @@ export default function Footer() {
     <footer className="footer" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="footer__inner">
         <div className="footer__brand">
-          <img src="/images/logo.jpg" alt="Avocado Cooks Logo" className="footer__logo" />
+          <img src="/images/logo.jpg" alt="Avo Cooks Logo" className="footer__logo" />
           <div>
             <p className="footer__name">{t.siteName}</p>
             <p className="footer__tagline">{t.tagline}</p>

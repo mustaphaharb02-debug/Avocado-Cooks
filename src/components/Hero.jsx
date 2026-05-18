@@ -21,7 +21,7 @@ export default function Hero() {
       <div className="hero__content">
         {/* Logo */}
         <div className="hero__logo-wrap animate-scaleIn">
-          <img src="/images/logo.jpg" alt="Avocado Cooks Logo" className="hero__logo" />
+          <img src="/images/logo.jpg" alt="Avo Cooks Logo" className="hero__logo" />
         </div>
 
         <h1 className="hero__title animate-fadeInUp" style={{ animationDelay: '0.1s' }}>

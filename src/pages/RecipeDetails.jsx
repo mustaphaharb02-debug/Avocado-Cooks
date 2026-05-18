@@ -39,7 +39,7 @@ export default function RecipeDetails() {
             />
           ) : (
             <div className="recipe-details__img-placeholder">
-              <span>🥑</span>
+              <span className="ingredient-dot">•</span>
               <p>{content.title}</p>
             </div>
           )}
@@ -81,7 +81,7 @@ export default function RecipeDetails() {
             <ul className="ingredients-list">
               {content.ingredients.map((item, i) => (
                 <li key={i} className="ingredients-list__item">
-                  <span className="ingredients-list__bullet">🥑</span>
+                  <span className="ingredients-list__bullet">●</span>
                   {item}
                 </li>
               ))}

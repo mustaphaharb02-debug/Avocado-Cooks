@@ -66,7 +66,7 @@ export default function RecipesPage() {
       <div className="recipes-page__grid-wrap">
         {filtered.length === 0 ? (
           <div className="recipes-page__empty">
-            <span>🥑</span>
+            <span className="ingredient-dot">•</span>
             <p>{isRTL ? 'لا توجد وصفات مطابقة' : 'No recipes found'}</p>
           </div>
         ) : (

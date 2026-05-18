@@ -1,5 +1,5 @@
 // =============================================
-//  AVOCADO COOKS — Recipe Data
+//  AVO COOKS — Recipe Data
 //  ✏️  ADD OR EDIT YOUR RECIPES HERE
 //
 //  Each recipe must have:
@@ -20,7 +20,7 @@ export const recipes = [
 
   en: {
     title: "Pasta with Béchamel Sauce",
-    description: "Creamy pasta with homemade béchamel sauce and mozzarella cheese.",
+    description: "Creamy pasta with béchamel sauce and mozzarella cheese.",
 
     ingredients: [
       "Butter",
@@ -53,7 +53,7 @@ export const recipes = [
 
   ar: {
     title: "باستا بالبشاميل",
-    description: "باستا كريمية مع صوص بشاميل منزلي وجبن موزاريلا.",
+    description: "باستا كريمية مع صوص بشاميل وجبن موزاريلا.",
 
     ingredients: [
       "زبدة",
@@ -95,7 +95,7 @@ export const recipes = [
 
   en: {
     title: "Pizza for Lazy and Busy People",
-    description: "A quick homemade pizza using naan bread, perfect for busy days.",
+    description: "A quick pizza using naan bread, perfect for busy days.",
 
     ingredients: [
       "Naan or any other bread",
@@ -153,7 +153,7 @@ export const recipes = [
 
   en: {
     title: "Fresh Salad",
-    description: "A fresh salad with roasted chickpeas, feta cheese, walnuts, and homemade dressing.",
+    description: "A fresh salad with roasted chickpeas, feta cheese, walnuts, and dressing.",
 
     ingredients: [
       "Lettuce",
@@ -380,7 +380,7 @@ export const recipes = [
 
   en: {
     title: "Sushi Bowl",
-    description: "A quick homemade sushi bowl with salmon, rice, avocado, and seaweed.",
+    description: "A quick sushi bowl with salmon, rice, avocado, and seaweed.",
 
     ingredients: [
       "Salmon or canned tuna",
@@ -413,7 +413,7 @@ export const recipes = [
 
   ar: {
     title: "سوشي باول",
-    description: "سوشي منزلي سريع مع السالمون أو التونة، الأرز، الأفوكادو، والأعشاب البحرية.",
+    description: "سوشي مع السالمون أو التونة، الأرز، الأفوكادو، والأعشاب البحرية.",
 
     ingredients: [
       "سالمون أو تونة معلبة",
@@ -807,7 +807,7 @@ export const recipes = [
 
   en: {
     title: "Spicy Tuna Sushi Rolls",
-    description: "Homemade sushi rolls with creamy spicy tuna, avocado, cucumber, and nori seaweed.",
+    description: "sushi rolls with creamy spicy tuna, avocado, cucumber, and nori seaweed.",
 
     ingredients: [
       "Sushi rice or medium-grain rice",
@@ -1096,7 +1096,7 @@ export const recipes = [
 
   en: {
     title: "Golden Fish Rice Bowl with Creamy Hummus",
-    description: "Crispy seasoned fish served with aromatic basmati rice and homemade creamy hummus.",
+    description: "Crispy seasoned fish served with aromatic basmati rice and creamy hummus.",
 
     ingredients: [
       "Skinless fish fillets",
@@ -1152,7 +1152,7 @@ export const recipes = [
 
   ar: {
     title: "باول رز بالسمك الذهبي مع حمص كريمي",
-    description: "سمك مقرمش متبل يقدم مع رز بسمتي معطر وحمص منزلي كريمي.",
+    description: "سمك مقرمش متبل يقدم مع رز بسمتي معطر وحمص كريمي.",
 
     ingredients: [
       "فيليه سمك بدون جلد",
@@ -1360,7 +1360,7 @@ export const recipes = [
       "Garnish with black and white sesame seeds."
     ],
 
-    notes: "This is an easier homemade version, not the traditional method."
+    notes: "This is an easier version, not the traditional method."
   },
 
   ar: {
@@ -1843,7 +1843,7 @@ export const recipes = [
 
   en: {
     title: "Creamy Miso Chicken Noodle Soup",
-    description: "A rich homemade noodle soup with chicken stock, miso, mushrooms, soft eggs, and aromatic herbs.",
+    description: "A rich noodle soup with chicken stock, miso, mushrooms, soft eggs, and aromatic herbs.",
 
     ingredients: [
       "Noodles",

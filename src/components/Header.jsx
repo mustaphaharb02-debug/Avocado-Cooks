@@ -24,7 +24,7 @@ export default function Header() {
       <div className="header__inner">
         {/* Logo */}
         <Link to="/" className="header__brand">
-          <img src="/images/logo.jpg" alt="Avocado Cooks Logo" className="header__logo" />
+          <img src="/images/logo.jpg" alt="Avo Cooks Logo" className="header__logo" />
           <span className="header__name">{t.siteName}</span>
         </Link>
 
@@ -40,10 +40,8 @@ export default function Header() {
 
         {/* Right Side */}
         <div className="header__actions">
-          <button className="lang-toggle" onClick={toggleLang} aria-label="Toggle language">
-            <span className={lang === 'en' ? 'lang-toggle__active' : ''}>EN</span>
-            <span className="lang-toggle__divider">|</span>
-            <span className={lang === 'ar' ? 'lang-toggle__active' : ''}>AR</span>
+          <button className="lang-toggle">
+           <span className="lang-toggle__active">EN</span>
           </button>
 
           {/* Hamburger */}

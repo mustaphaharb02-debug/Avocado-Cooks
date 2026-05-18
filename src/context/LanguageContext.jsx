@@ -4,8 +4,8 @@ const LanguageContext = createContext()
 
 export const translations = {
   en: {
-    siteName: 'Avocado Cooks',
-    tagline: 'Simple and warm meals for you',
+    siteName: 'Avo Cooks',
+    tagline: 'by Mona',
     home: 'Home',
     recipes: 'Recipes',
     featured: 'Featured Recipes',
@@ -24,10 +24,10 @@ export const translations = {
     noComments: 'Be the first to comment!',
     nameRequired: 'Please enter your name.',
     commentRequired: 'Please write a comment.',
-    footerText: 'Made with 🥑 love by Avocado Cooks',
+    footerText: 'Made with 🥑 love by Avo Cooks',
     followUs: 'Follow us on Instagram',
     gallery: 'Food Gallery',
-    heroSub: 'Homemade recipes with heart, shared with you',
+    heroSub: 'Simple and warm meals for you',
     searchPlaceholder: 'Search recipes...',
     allCategories: 'All',
     postedOn: 'Posted',

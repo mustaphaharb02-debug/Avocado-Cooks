@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import RecipesPage from './pages/RecipesPage'
 import RecipeDetails from './pages/RecipeDetails'
 import './App.css'
+import ScrollToTop from "./components/ScrollToTop";
 
 function Layout({ children }) {
   return (
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <LanguageProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Layout>
           <Routes>
             <Route path="/"            element={<HomePage />} />
