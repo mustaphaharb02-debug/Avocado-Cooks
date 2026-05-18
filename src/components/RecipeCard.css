@@ -190,29 +190,6 @@
   animation: pulse 0.4s ease;
 }
 
-.reaction-btn:hover {
-  transform: scale(1.08);
-}
-
-.reaction-btn--like.active,
-.reaction-btn--like:hover {
-  background: #fde8f0;
-  color: #d4637a;
-}
-
-.reaction-btn--dislike.active,
-.reaction-btn--dislike:hover {
-  background: var(--beige-dark);
-  color: var(--text-mid);
-}
-
-.reaction-btn__icon {
-  font-size: 0.85rem;
-}
-
-.reaction-btn--like.active .reaction-btn__icon {
-  animation: pulse 0.4s ease;
-}
 
 /* CTA */
 .recipe-card__cta {
