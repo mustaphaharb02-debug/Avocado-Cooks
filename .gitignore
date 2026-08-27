@@ -28,3 +28,8 @@ pnpm-debug.log*
 
 # Local agent/editor tooling
 .claude/
+
+# Firebase CLI
+firebase-debug.log*
+firestore-debug.log*
+.firebase/

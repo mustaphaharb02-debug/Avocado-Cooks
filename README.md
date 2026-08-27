@@ -102,9 +102,37 @@ Node 20+ (`.nvmrc`).
 
 ---
 
-## 🌍 Deploying (Render)
+## 🌍 Deploying
 
-`render.yaml` is set up for a static site:
+The site is a folder of static files, so any static host works. Two are
+configured; you only need one.
+
+### Firebase Hosting (`firebase.json`)
+
+Serves the site from the same project that holds the database, so the admin
+login works with no extra configuration — `avo-cooks.web.app` is already an
+authorised sign-in domain.
+
+```bash
+npm run build
+npx firebase-tools login          # once, opens your browser
+npx firebase-tools deploy --only hosting
+```
+
+The site lands on `https://avo-cooks.web.app` (and `.firebaseapp.com`).
+`firebase.json` sets a rewrite so `/recipe/5` and `/admin` survive a hard
+refresh, caches the hashed files in `assets/` for a year, and keeps
+`index.html` uncached so a deploy is picked up immediately.
+
+To publish the rules at the same time:
+
+```bash
+npx firebase-tools deploy --only hosting,firestore:rules,storage
+```
+
+### Render (`render.yaml`)
+
+A static site that builds on push:
 
 - Build command: `npm ci && npm run build`
 - Publish directory: `dist`
@@ -112,7 +140,11 @@ Node 20+ (`.nvmrc`).
   `/admin` directly returns 404. If the service was created by hand, add the
   rule under **Redirects/Rewrites** in the Render dashboard.
 
-`dist/` and `node_modules/` are no longer committed — Render builds them.
+If you use a custom domain here, add it under **Firebase Console →
+Authentication → Settings → Authorised domains**, or admin sign-in is refused
+on that domain.
+
+`dist/` and `node_modules/` are not committed — the host builds them.
 
 ---
 
