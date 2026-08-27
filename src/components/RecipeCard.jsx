@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../context/LanguageContext'
-import useFirebaseReactions from "../hooks/useFirebaseReactions";
+import useFirebaseReactions from '../hooks/useFirebaseReactions'
 import './RecipeCard.css'
 
 export default function RecipeCard({ recipe }) {
   const { lang, t, isRTL } = useLang()
   const [imgError, setImgError] = useState(false)
 
-  const { likes, dislikes, liked, disliked, handleLike, handleDislike } =
+  const { likes, dislikes, liked, disliked, handleLike, handleDislike, saving } =
     useFirebaseReactions(recipe.id)
 
   const content = recipe[lang]
@@ -20,11 +20,13 @@ export default function RecipeCard({ recipe }) {
     <article className="recipe-card animate-fadeInUp" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Image */}
       <Link to={`/recipe/${recipe.id}`} className="recipe-card__img-wrap">
-        {!imgError ? (
+        {!imgError && recipe.image ? (
           <img
             src={recipe.image}
             alt={content.title}
             className="recipe-card__img"
+            loading="lazy"
+            decoding="async"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -51,7 +53,9 @@ export default function RecipeCard({ recipe }) {
             <button
               className={`reaction-btn reaction-btn--like ${liked ? 'active' : ''}`}
               onClick={onLike}
-              aria-label="Like"
+              disabled={saving}
+              aria-pressed={liked}
+              aria-label={`${t.likes}: ${likes}`}
             >
               <span className="reaction-btn__icon">💚</span>
               <span>{likes}</span>
@@ -59,7 +63,9 @@ export default function RecipeCard({ recipe }) {
             <button
               className={`reaction-btn reaction-btn--dislike ${disliked ? 'active' : ''}`}
               onClick={onDislike}
-              aria-label="Dislike"
+              disabled={saving}
+              aria-pressed={disliked}
+              aria-label={`${t.dislikes}: ${dislikes}`}
             >
               <span className="reaction-btn__icon">✕</span>
               <span>{dislikes}</span>

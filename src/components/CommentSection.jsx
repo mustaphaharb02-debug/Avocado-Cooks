@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import { useLang } from '../context/LanguageContext'
-import useFirebaseComments from '../hooks/useFirebaseComments'
+import useFirebaseComments, { NAME_MAX, TEXT_MAX } from '../hooks/useFirebaseComments'
 import './CommentSection.css'
 
 export default function CommentSection({ recipeId }) {
   const { t, isRTL } = useLang()
 
-  const { comments, addComment } = useFirebaseComments(recipeId)
+  const { comments, addComment, loading, error } = useFirebaseComments(recipeId)
 
   const [name, setName] = useState('')
   const [text, setText] = useState('')
   const [errors, setErrors] = useState({})
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
   const validate = () => {
@@ -27,20 +29,29 @@ export default function CommentSection({ recipeId }) {
 
     const errs = validate()
     setErrors(errs)
+    setSendError('')
 
     if (Object.keys(errs).length > 0) return
 
-    await addComment({
-      name: name.trim(),
-      text: text.trim(),
-    })
+    setSending(true)
+    try {
+      await addComment({ name: name.trim(), text: text.trim() })
 
-    setName('')
-    setText('')
-    setErrors({})
-    setSubmitted(true)
-
-    setTimeout(() => setSubmitted(false), 3000)
+      setName('')
+      setText('')
+      setErrors({})
+      setSubmitted(true)
+      setTimeout(() => setSubmitted(false), 3000)
+    } catch (err) {
+      console.error('[comments] could not post:', err)
+      setSendError(
+        isRTL
+          ? 'تعذّر إرسال تعليقك. حاول مرة أخرى.'
+          : 'Your comment could not be sent. Please try again.'
+      )
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -60,6 +71,7 @@ export default function CommentSection({ recipeId }) {
               type="text"
               className="comment-form__input"
               value={name}
+              maxLength={NAME_MAX}
               onChange={(e) => setName(e.target.value)}
               placeholder={isRTL ? 'اسمك هنا...' : 'Your name...'}
             />
@@ -80,6 +92,7 @@ export default function CommentSection({ recipeId }) {
           <textarea
             className="comment-form__textarea"
             value={text}
+            maxLength={TEXT_MAX}
             onChange={(e) => setText(e.target.value)}
             placeholder={t.yourComment}
             rows={4}
@@ -93,8 +106,8 @@ export default function CommentSection({ recipeId }) {
         </div>
 
         <div className="comment-form__actions">
-          <button type="submit" className="comment-form__submit">
-            {t.submit}
+          <button type="submit" className="comment-form__submit" disabled={sending}>
+            {sending ? (isRTL ? 'جارٍ الإرسال…' : 'Sending…') : t.submit}
           </button>
 
           {submitted && (
@@ -102,12 +115,20 @@ export default function CommentSection({ recipeId }) {
               ✓ {isRTL ? 'تم الإرسال!' : 'Submitted!'}
             </span>
           )}
+
+          {sendError && <span className="comment-form__error">{sendError}</span>}
         </div>
       </form>
 
       {/* Comments List */}
       <div className="comment-list">
-        {comments.length === 0 ? (
+        {loading ? (
+          <p className="comment-list__empty">{isRTL ? 'جارٍ التحميل…' : 'Loading…'}</p>
+        ) : error ? (
+          <p className="comment-list__empty">
+            {isRTL ? 'تعذّر تحميل التعليقات.' : 'Comments could not be loaded.'}
+          </p>
+        ) : comments.length === 0 ? (
           <p className="comment-list__empty">
             {t.noComments} 🥑
           </p>
@@ -127,7 +148,8 @@ export default function CommentSection({ recipeId }) {
                   <span className="comment-item__date">
                     {c.createdAt?.toDate
                       ? c.createdAt.toDate().toLocaleDateString(
-                          isRTL ? 'ar-SA' : 'en-GB',
+                          // ar-SA would print Hijri dates
+                          isRTL ? 'ar-EG' : 'en-GB',
                           {
                             year: 'numeric',
                             month: 'short',

@@ -3,3 +3,75 @@
   min-height: 100vh;
   padding-top: 72px;
 }
+
+/* Suspense fallback while a lazy route loads */
+.route-loading {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  animation: routePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes routePulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.55; }
+}
+
+/* Loading + empty states for recipe data */
+.page-state {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--text-light);
+  padding: 40px 20px;
+}
+
+.page-state__icon {
+  font-size: 2.4rem;
+  animation: routePulse 1.2s ease-in-out infinite;
+}
+
+/* Inline warning used when a like could not be saved */
+.reaction-error {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #a94734;
+  background: #fbe6e0;
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  display: inline-block;
+}
+
+/* Error boundary screen */
+.app-crash {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+  background: var(--cream);
+  color: var(--text-dark);
+}
+
+.app-crash__icon {
+  font-size: 3rem;
+}
+
+.app-crash__btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--green-dark);
+  color: var(--white);
+  font-family: inherit;
+  font-weight: 700;
+  padding: 10px 22px;
+  cursor: pointer;
+}

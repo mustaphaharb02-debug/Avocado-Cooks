@@ -30,7 +30,13 @@ export default function Footer() {
           </a>
         </nav>
 
-        <p className="footer__copy">{t.footerText}</p>
+        <p className="footer__copy">
+          {t.footerText}
+          {/* discreet way in to the recipe manager */}
+          <Link to="/admin" className="footer__admin" aria-label="Admin dashboard" title="Admin">
+            {' '}·
+          </Link>
+        </p>
       </div>
 
       {/* Decorative wave top */}

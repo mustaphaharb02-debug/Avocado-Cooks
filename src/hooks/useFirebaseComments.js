@@ -1,61 +1,76 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react'
 import {
-  collection,
   addDoc,
-  query,
-  orderBy,
+  collection,
+  deleteDoc,
+  doc,
+  limit,
   onSnapshot,
+  orderBy,
+  query,
   serverTimestamp,
-} from "firebase/firestore";
+} from 'firebase/firestore'
 
-import { db } from "../firebase";
+import { db } from '../firebase'
 
+export const NAME_MAX = 50
+export const TEXT_MAX = 1000
+
+/** Comments for one recipe, stored at recipes/{recipeId}/comments. */
 export default function useFirebaseComments(recipeId) {
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!recipeId) return;
+    if (!recipeId) {
+      setLoading(false)
+      return
+    }
 
-    const commentsRef = collection(
-      db,
-      "recipes",
-      String(recipeId),
-      "comments"
-    );
+    setLoading(true)
+    const commentsRef = collection(db, 'recipes', String(recipeId), 'comments')
+    const q = query(commentsRef, orderBy('createdAt', 'desc'), limit(200))
 
-    const q = query(commentsRef, orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setComments(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })))
+        setLoading(false)
+        setError(null)
+      },
+      (err) => {
+        console.error('[comments] listener failed:', err)
+        setError(err)
+        setLoading(false)
+      }
+    )
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const loadedComments = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    return () => unsubscribe()
+  }, [recipeId])
 
-      setComments(loadedComments);
-    });
+  const addComment = useCallback(
+    async (comment) => {
+      const name = String(comment?.name ?? '').trim().slice(0, NAME_MAX)
+      const text = String(comment?.text ?? '').trim().slice(0, TEXT_MAX)
+      if (!recipeId || !name || !text) return
 
-    return () => unsubscribe();
-  }, [recipeId]);
+      const commentsRef = collection(db, 'recipes', String(recipeId), 'comments')
 
-  const addComment = async (comment) => {
-    if (!comment.text.trim()) return;
+      // Errors bubble up so the form can tell the visitor what happened.
+      await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() })
+    },
+    [recipeId]
+  )
 
-    const commentsRef = collection(
-      db,
-      "recipes",
-      String(recipeId),
-      "comments"
-    );
+  /** Admin-only (allowed by the security rules); used for moderation. */
+  const deleteComment = useCallback(
+    async (commentId) => {
+      if (!recipeId || !commentId) return
+      await deleteDoc(doc(db, 'recipes', String(recipeId), 'comments', commentId))
+    },
+    [recipeId]
+  )
 
-    await addDoc(commentsRef, {
-      name: comment.name,
-      text: comment.text,
-      createdAt: serverTimestamp(),
-    });
-  };
-
-  return {
-    comments,
-    addComment,
-  };
+  return { comments, addComment, deleteComment, loading, error }
 }

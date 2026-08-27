@@ -1,27 +1,38 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import RecipeCard from '../components/RecipeCard'
 import { useLang } from '../context/LanguageContext'
-import { recipes } from '../data/recipes'
+import { useRecipes } from '../context/RecipesContext'
 import './RecipesPage.css'
 
 export default function RecipesPage() {
   const { lang, t, isRTL } = useLang()
+  const { recipes, loading } = useRecipes()
   const [search, setSearch]     = useState('')
   const [category, setCategory] = useState('All')
 
-  const categories = ['All', ...new Set(recipes.map(r => r.category))]
+  const categories = useMemo(
+    () => ['All', ...new Set(recipes.map(r => r.category).filter(Boolean))],
+    [recipes]
+  )
 
-  const filtered = recipes.filter(r => {
-    const content = r[lang]
-    const matchSearch =
-      content.title.toLowerCase().includes(search.toLowerCase()) ||
-      content.description.toLowerCase().includes(search.toLowerCase())
-    const matchCategory = category === 'All' || r.category === category
-    return matchSearch && matchCategory
-  })
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return recipes.filter(r => {
+      const content = r[lang]
+      const matchSearch =
+        !q ||
+        content.title.toLowerCase().includes(q) ||
+        content.description.toLowerCase().includes(q)
+      const matchCategory = category === 'All' || r.category === category
+      return matchSearch && matchCategory
+    })
+  }, [recipes, lang, search, category])
 
+  // Arabic labels for the categories that have one; anything a new recipe
+  // introduces simply shows its own name.
   const catLabel = isRTL ? {
-    All: 'الكل', Chicken: 'دجاج', Vegetarian: 'نباتي', Soup: 'شوربة', Pastry: 'معجنات'
+    All: 'الكل', Chicken: 'دجاج', Vegetarian: 'نباتي', Soup: 'شوربة', Pastry: 'معجنات',
+    Pasta: 'باستا', Salad: 'سلطة', Dessert: 'حلويات', Breakfast: 'فطور', Seafood: 'مأكولات بحرية',
   } : {}
 
   return (
@@ -64,7 +75,12 @@ export default function RecipesPage() {
 
       {/* Grid */}
       <div className="recipes-page__grid-wrap">
-        {filtered.length === 0 ? (
+        {loading && recipes.length === 0 ? (
+          <div className="page-state">
+            <span className="page-state__icon">🥑</span>
+            <p>{isRTL ? 'جارٍ التحميل…' : 'Loading recipes…'}</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="recipes-page__empty">
             <span className="ingredient-dot">•</span>
             <p>{isRTL ? 'لا توجد وصفات مطابقة' : 'No recipes found'}</p>

@@ -1,20 +1,34 @@
 import React, { useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { useLang } from '../context/LanguageContext'
-import { recipes } from '../data/recipes'
+import { useRecipes } from '../context/RecipesContext'
 import CommentSection from '../components/CommentSection'
-import useFirebaseReactions from "../hooks/useFirebaseReactions";
+import useFirebaseReactions from '../hooks/useFirebaseReactions'
 import './RecipeDetails.css'
 
 export default function RecipeDetails() {
   const { id } = useParams()
   const { lang, t, isRTL } = useLang()
-  const recipe = recipes.find(r => r.id === Number(id))
+  const { recipes, loading } = useRecipes()
   const [imgError, setImgError] = useState(false)
 
-  // Hook is always called — before any conditional return
-  const { likes, dislikes, liked, disliked, handleLike, handleDislike } =
+  const recipe = recipes.find(r => r.id === Number(id))
+
+  // Hooks must run on every render — before any conditional return.
+  const { likes, dislikes, liked, disliked, handleLike, handleDislike, saving, error } =
     useFirebaseReactions(recipe?.id ?? 0)
+
+  // Recipes arrive from Firestore, so wait before deciding it doesn't exist.
+  if (!recipe && loading) {
+    return (
+      <main className="recipe-details">
+        <div className="page-state">
+          <span className="page-state__icon">🥑</span>
+          <p>{isRTL ? 'جارٍ التحميل…' : 'Loading recipe…'}</p>
+        </div>
+      </main>
+    )
+  }
 
   if (!recipe) return <Navigate to="/recipes" replace />
 
@@ -30,11 +44,12 @@ export default function RecipeDetails() {
 
         {/* Hero Image */}
         <div className="recipe-details__img-wrap">
-          {!imgError ? (
+          {!imgError && recipe.image ? (
             <img
               src={recipe.image}
               alt={content.title}
               className="recipe-details__img"
+              decoding="async"
               onError={() => setImgError(true)}
             />
           ) : (
@@ -56,6 +71,8 @@ export default function RecipeDetails() {
             <button
               className={`reaction-btn-lg ${liked ? 'liked' : ''}`}
               onClick={handleLike}
+              disabled={saving}
+              aria-pressed={liked}
             >
               <span>💚</span>
               <span>{likes} {t.likes}</span>
@@ -63,11 +80,21 @@ export default function RecipeDetails() {
             <button
               className={`reaction-btn-lg reaction-btn-lg--dis ${disliked ? 'disliked' : ''}`}
               onClick={handleDislike}
+              disabled={saving}
+              aria-pressed={disliked}
             >
               <span>✕</span>
               <span>{dislikes} {t.dislikes}</span>
             </button>
           </div>
+
+          {error && (
+            <p className="reaction-error">
+              {isRTL
+                ? 'تعذّر حفظ إعجابك. حاول مرة أخرى.'
+                : 'Your like could not be saved. Please try again.'}
+            </p>
+          )}
         </div>
 
         {/* Content Grid */}

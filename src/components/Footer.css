@@ -99,6 +99,17 @@
   color: rgba(255,255,255,0.45);
 }
 
+/* quiet link to /admin — findable for the owner, invisible to everyone else */
+.footer__admin {
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  padding: 0 4px;
+}
+
+.footer__admin:hover {
+  color: var(--yellow-warm);
+}
+
 @media (max-width: 600px) {
   .footer__inner {
     padding: 36px 20px 28px;

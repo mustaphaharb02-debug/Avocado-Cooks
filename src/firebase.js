@@ -1,15 +1,35 @@
+// Auth and Storage are imported by the admin code only, so visitors never
+// download them — see src/context/AuthContext.jsx and src/lib/adminApi.js.
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
+// Firebase web config is public by design — it only identifies the project.
+// Real protection lives in firestore.rules / storage.rules.
+// Values can still be overridden per environment with a .env file
+// (see .env.example).
+const env = import.meta.env
+
 const firebaseConfig = {
-  apiKey: "AIzaSyATBPOYJgAAadue6-lalDlokkdJLxshq1w",
-  authDomain: "avo-cooks.firebaseapp.com",
-  projectId: "avo-cooks",
-  storageBucket: "avo-cooks.firebasestorage.app",
-  messagingSenderId: "916894603653",
-  appId: "1:916894603653:web:45cd79f4b913f80a9d8cec"
+  apiKey:            env.VITE_FIREBASE_API_KEY            || "AIzaSyATBPOYJgAAadue6-lalDlokkdJLxshq1w",
+  authDomain:        env.VITE_FIREBASE_AUTH_DOMAIN        || "avo-cooks.firebaseapp.com",
+  projectId:         env.VITE_FIREBASE_PROJECT_ID         || "avo-cooks",
+  storageBucket:     env.VITE_FIREBASE_STORAGE_BUCKET     || "avo-cooks.firebasestorage.app",
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || "916894603653",
+  appId:             env.VITE_FIREBASE_APP_ID             || "1:916894603653:web:45cd79f4b913f80a9d8cec",
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
+
+// Who may open the admin dashboard. Keep this list in sync with the
+// isAdmin() e-mail list inside firestore.rules and storage.rules —
+// this one only hides the UI, the rules are what actually protect data.
+export const ADMIN_EMAILS = (env.VITE_ADMIN_EMAILS || "mustapha.harb02@gmail.com")
+  .split(",")
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean);
+
+export function isAdminEmail(email) {
+  return !!email && ADMIN_EMAILS.includes(email.toLowerCase());
+}

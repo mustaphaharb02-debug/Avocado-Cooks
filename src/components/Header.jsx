@@ -40,8 +40,13 @@ export default function Header() {
 
         {/* Right Side */}
         <div className="header__actions">
-          <button className="lang-toggle">
-           <span className="lang-toggle__active">EN</span>
+          <button
+            className="lang-toggle"
+            onClick={toggleLang}
+            aria-label={lang === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
+            title={lang === 'en' ? 'العربية' : 'English'}
+          >
+            <span className="lang-toggle__active">{lang === 'en' ? 'ع' : 'EN'}</span>
           </button>
 
           {/* Hamburger */}
