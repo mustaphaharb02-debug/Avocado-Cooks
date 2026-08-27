@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useAuth, authErrorMessage } from '../../context/AuthContext'
+import { safeRedirectPath } from '../../lib/safePath'
 import './Admin.css'
 
 export default function AdminLogin() {
@@ -14,7 +15,7 @@ export default function AdminLogin() {
   const [notice, setNotice] = useState('')
 
   if (!loading && user && isAdmin) {
-    return <Navigate to={location.state?.from || '/admin'} replace />
+    return <Navigate to={safeRedirectPath(location.state?.from)} replace />
   }
 
   const handleSubmit = async (event) => {

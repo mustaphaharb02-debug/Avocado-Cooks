@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { safeRedirectPath } from '../lib/safePath'
 
 /** Wraps the dashboard: signed-out visitors get the login page. */
 export default function RequireAdmin({ children }) {
@@ -17,7 +18,13 @@ export default function RequireAdmin({ children }) {
   }
 
   if (!user) {
-    return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
+    return (
+      <Navigate
+        to="/admin/login"
+        replace
+        state={{ from: safeRedirectPath(location.pathname) }}
+      />
+    )
   }
 
   if (!isAdmin) {
