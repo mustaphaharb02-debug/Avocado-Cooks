@@ -1,157 +1,186 @@
-# 🥑 Avo Cooks Website
+# 🥑 Avo Cooks
 
-A bilingual (English/Arabic) food recipe website built with React + Vite.
-
----
-
-## 📁 Project Structure
-
-```
-avo_cooks/
-├── public/
-│   └── images/              ← 📸 PUT ALL YOUR IMAGES HERE
-│       ├── logo.jpg         ← Your avocado logo (required)
-│       ├── musakhan-rolls.jpg
-│       ├── avocado-toast.jpg
-│       └── lentil-soup.jpg
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx        ← Top navigation bar
-│   │   ├── Hero.jsx          ← Homepage hero section
-│   │   ├── RecipeCard.jsx    ← Recipe card for gallery
-│   │   ├── CommentSection.jsx← Comments & suggestions
-│   │   └── Footer.jsx        ← Footer
-│   ├── context/
-│   │   └── LanguageContext.jsx ← EN/AR language system
-│   ├── data/
-│   │   └── recipes.js        ← ✏️ EDIT YOUR RECIPES HERE
-│   ├── pages/
-│   │   ├── HomePage.jsx
-│   │   ├── RecipesPage.jsx
-│   │   └── RecipeDetails.jsx
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── index.html
-├── package.json
-└── vite.config.js
-```
+A bilingual (English / Arabic) recipe website built with React + Vite, with a
+built-in **admin dashboard** so recipes are added from the browser — no code
+editing needed.
 
 ---
 
-## 🚀 Setup in PyCharm
+## ⚡ First-time setup (do this once)
 
-### Step 1 — Install Node.js
-1. Go to https://nodejs.org and download the **LTS** version
-2. Install it (check "Add to PATH" if prompted)
-3. Verify: open a terminal and run `node --version`
+The website talks to Firebase. Three things must be set up in the
+[Firebase console](https://console.firebase.google.com/project/avo-cooks) —
+without them likes, comments and the dashboard will not work.
 
-### Step 2 — Open the project in PyCharm
-1. Open PyCharm
-2. Click **File → Open** and select the `avo_cooks` folder
-3. PyCharm will detect it as a JavaScript/Node project
+Do them **in this order** — each step depends on the one before it.
 
-### Step 3 — Install dependencies
-Open the **Terminal** inside PyCharm (bottom panel) and run:
+### 1. Publish the database rules  ← **this is what breaks likes**
+
+Until this is done Firestore refuses every read and write, and the site
+quietly falls back to the recipes bundled in the code: it looks normal, but
+likes and comments do nothing.
+
+Either paste them in the console:
+
+1. Firebase Console → **Firestore Database → Rules**
+2. Delete what is there, paste the whole contents of [`firestore.rules`](firestore.rules)
+3. Press **Publish**, then do the same for [`storage.rules`](storage.rules) under **Storage → Rules**
+
+…or publish both from the project root with the Firebase CLI:
+
 ```bash
-npm install
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules,storage
 ```
-This installs React, Vite, and all required packages.
 
-### Step 4 — Run the website locally
+`firebase.json` and `.firebaserc` in the repo point the CLI at the `avo-cooks`
+project, so there is nothing else to configure.
+
+### 2. Create the admin account
+
+1. Firebase Console → **Authentication → Sign-in method** → enable **Email/Password**
+2. **Authentication → Users → Add user** → e-mail + password
+3. That e-mail must appear in **both** places:
+   - `isAdmin()` inside `firestore.rules` (and `storage.rules`), then publish again
+   - `ADMIN_EMAILS` in `src/firebase.js` (or `VITE_ADMIN_EMAILS` in `.env`)
+
+The e-mail list in `src/firebase.js` only decides who *sees* the dashboard.
+The list inside the rules is what actually protects the data, so the two must
+match — an address in the first but not the second gets a dashboard where
+every save fails.
+
+### 3. (Optional) Enable photo uploads
+
+Firebase Console → **Storage → Get started**, then paste
+[`storage.rules`](storage.rules) into **Storage → Rules** and publish.
+If Storage is not enabled, the dashboard still works — you just paste an image
+link instead of uploading a file.
+
+---
+
+## 🔐 Using the admin dashboard
+
+Open **`/admin`** on the site (or click the small `·` at the end of the footer)
+and sign in with the admin account.
+
+| What you can do | How |
+|---|---|
+| Add a recipe | **➕ New recipe** → fill in English + Arabic → **Save** |
+| Edit a recipe | **✏️ Edit** on any row |
+| Photo | **📤 Upload a photo**, or paste `/images/name.jpg` / a link |
+| Show on homepage | the **⭐ Feature** button |
+| Hide from visitors | the **👁 Visible** button (keeps likes and comments) |
+| Delete | 🗑 (asks for confirmation) |
+| Read / delete comments | **💬 Comments** |
+
+Ingredients and steps are typed **one per line** — no commas, no brackets.
+
+**The first time**, the database has no recipes yet, so the dashboard shows a
+banner with **📥 Import the built-in recipes**. Press it once to copy the
+recipes from `src/data/recipes.js` into Firestore. After that, everything is
+edited from the dashboard and the site reads from the database.
+
+Do not skip this step. The rules tie every like and every comment to a real
+recipe document, so on a recipe that exists only in the bundled fallback list
+both are refused.
+
+> `src/data/recipes.js` stays in the project as a safety net: if Firestore is
+> unreachable, visitors still see those recipes instead of an empty site.
+
+---
+
+## 🚀 Running it locally
+
 ```bash
-npm run dev
-```
-Then open your browser at: **http://localhost:5173**
-
-### Step 5 — Build for production (when ready to publish)
-```bash
-npm run build
-```
-The built files will be in the `dist/` folder.
-
----
-
-## 🖼️ Where to Place Images
-
-All images go inside `public/images/`:
-
-| File | Purpose |
-|------|---------|
-| `logo.jpg` | Your avocado logo (used in header & hero) |
-| `musakhan-rolls.jpg` | Photo for Musakhan Rolls recipe |
-| `avocado-toast.jpg` | Photo for Avocado Toast recipe |
-| `lentil-soup.jpg` | Photo for Lentil Soup recipe |
-
-**Rules:**
-- Images can be `.jpg`, `.jpeg`, `.png`, or `.webp`
-- Keep file names lowercase with hyphens (no spaces)
-- Recommended size: 800×600px or larger
-- If an image is missing, the site shows a 🥑 placeholder automatically
-
----
-
-## ✏️ How to Add or Edit Recipes
-
-Open `src/data/recipes.js`
-
-Each recipe looks like this:
-```js
-{
-  id: 4,                          // unique number
-  image: '/images/your-dish.jpg', // photo file name
-  category: 'Chicken',            // category label
-  en: {
-    title: 'My Recipe',
-    description: 'Short description.',
-    ingredients: ['item 1', 'item 2'],
-    steps: ['Step one.', 'Step two.'],
-    notes: 'Optional tip.',        // or remove this line
-  },
-  ar: {
-    title: 'وصفتي',
-    description: 'وصف قصير.',
-    ingredients: ['مكون 1', 'مكون 2'],
-    steps: ['الخطوة الأولى.', 'الخطوة الثانية.'],
-    notes: 'ملاحظة اختيارية.',
-  },
-},
+npm install     # once
+npm run dev     # http://localhost:5173
+npm run build   # production build into dist/
+npm run preview # check the production build locally
 ```
 
-Add it at the end of the `recipes` array in that file, then save.
+Node 20+ (`.nvmrc`).
 
 ---
 
-## 🌍 Language System
+## 🌍 Deploying (Render)
 
-- Click the **EN | AR** button in the header to switch languages
-- Arabic switches to Right-to-Left (RTL) layout automatically
-- To add new translations, edit `src/context/LanguageContext.jsx` under the `translations` object
+`render.yaml` is set up for a static site:
 
----
+- Build command: `npm ci && npm run build`
+- Publish directory: `dist`
+- **Rewrite rule `/*` → `/index.html`** — without it, opening `/recipe/5` or
+  `/admin` directly returns 404. If the service was created by hand, add the
+  rule under **Redirects/Rewrites** in the Render dashboard.
 
-## 💬 Comments
-
-Comments are saved in the browser's **localStorage** per recipe.
-They are NOT shared between visitors — each visitor sees their own comments only.
-
-To enable shared comments in the future, you would need a backend (e.g. Firebase or Supabase).
+`dist/` and `node_modules/` are no longer committed — Render builds them.
 
 ---
 
-## 🎨 Customizing Colors
+## 📁 Project structure
 
-Open `src/index.css` and edit the CSS variables at the top:
-```css
-:root {
-  --green-dark: #4a7c59;
-  --cream: #fdf8f0;
-  /* ... */
-}
+```
+src/
+├── components/     Header, Footer, Hero, RecipeCard, CommentSection, …
+├── context/
+│   ├── LanguageContext.jsx   EN/AR + RTL, remembered between visits
+│   ├── RecipesContext.jsx    recipes from Firestore (+ offline fallback)
+│   ├── ReactionsContext.jsx  likes/dislikes — one shared listener
+│   └── AuthContext.jsx       admin sign-in (loaded only on /admin)
+├── hooks/          useFirebaseReactions, useFirebaseComments
+├── lib/            recipeModel (shape + validation), adminApi (writes)
+├── pages/
+│   ├── HomePage, RecipesPage, RecipeDetails
+│   └── admin/      AdminArea, AdminLogin, AdminDashboard, RecipeEditor
+├── data/recipes.js seed + offline fallback
+└── firebase.js     Firebase config and admin e-mail list
 ```
 
 ---
 
-## 📱 Mobile
+## 💾 How the data is stored
 
-The website is fully responsive and works on phones and tablets.
+| Firestore path | What |
+|---|---|
+| `recipes/{id}` | one document per recipe (`en`, `ar`, `image`, `category`, `featured`, `published`) |
+| `recipes/{id}/comments/{auto}` | visitor comments (`name`, `text`, `createdAt`) |
+| `reactions/{id}` | `{ likes, dislikes }` counters |
+
+A visitor's own vote is remembered in their browser (`localStorage`), so the
+same person can't like the same recipe twice from that browser. The counts
+themselves always come from the database.
+
+---
+
+## 🔒 What is public and what is protected
+
+Everything on the website is enforced by `firestore.rules` and `storage.rules`
+in the database itself, not by the browser — so it holds even for someone
+using the API directly.
+
+| Who | Can |
+|---|---|
+| Anyone | read **published** recipes, read likes and comments |
+| Anyone | post a comment (name ≤ 50, text ≤ 1000 chars, server-stamped time) |
+| Anyone | like/dislike a real recipe, ±1 at a time, never below zero |
+| Admin only | create/edit/delete recipes, see **hidden** ones, delete comments, upload photos |
+| Nobody | edit a comment after posting, or touch anything outside these paths |
+
+The Firebase keys in `src/firebase.js` are **public by design** — they only
+name the project. They are not a password, and the rules above are what keep
+the data safe.
+
+Worth knowing:
+
+- Comments are not moderated before they appear. Delete unwanted ones from
+  **💬 Comments** in the dashboard.
+- A visitor's own vote is remembered only in their browser, so someone
+  determined can vote repeatedly by clearing it. The counters can only move
+  one at a time, so it stays slow and visible.
+- To lock both of those down further, turn on **App Check** in the Firebase
+  console — it rejects traffic that did not come from your website.
+
+---
+
+## 🎨 Customising colours
+
+Edit the CSS variables at the top of `src/index.css`.

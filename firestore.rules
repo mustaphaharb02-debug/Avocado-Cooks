@@ -1,0 +1,119 @@
+rules_version = '2';
+
+// =====================================================================
+//  AVO COOKS — Firestore Security Rules
+//
+//  HOW TO PUBLISH (either way works):
+//    A) Firebase Console → Firestore Database → Rules → paste → Publish
+//    B) from the project root:  npx firebase-tools deploy --only firestore:rules
+//
+//  TO ADD ANOTHER ADMIN:
+//    add their e-mail to isAdmin() below, publish again, and create the
+//    same account in Firebase Console → Authentication → Users → Add user.
+//    Keep the list in sync with VITE_ADMIN_EMAILS and storage.rules.
+//
+//  IMPORTANT: these rules assume every recipe lives in Firestore (run the
+//  one-time import in /admin). Likes and comments are tied to a real
+//  recipe document, so they are refused for recipes that only exist in
+//  the bundled fallback list.
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+             && request.auth.token.email.lower() in [
+                  'mustapha.harb02@gmail.com'
+                ];
+    }
+
+    function recipeExists(recipeId) {
+      return exists(/databases/$(database)/documents/recipes/$(recipeId));
+    }
+
+    // Visitors may only attach things to a recipe they can actually see.
+    function recipeIsPublic(recipeId) {
+      return recipeExists(recipeId)
+             && get(/databases/$(database)/documents/recipes/$(recipeId))
+                  .data.published == true;
+    }
+
+    function likeDelta() {
+      return request.resource.data.likes
+             - (resource == null ? 0 : resource.data.get('likes', 0));
+    }
+
+    function dislikeDelta() {
+      return request.resource.data.dislikes
+             - (resource == null ? 0 : resource.data.get('dislikes', 0));
+    }
+
+    function isValidComment() {
+      return request.resource.data.keys().hasOnly(['name', 'text', 'createdAt'])
+             && request.resource.data.keys().hasAll(['name', 'text', 'createdAt'])
+             && request.resource.data.name is string
+             && request.resource.data.text is string
+             && request.resource.data.name.size() > 0
+             && request.resource.data.name.size() <= 50
+             && request.resource.data.text.size() > 0
+             && request.resource.data.text.size() <= 1000
+             // Must be the server's clock, so nobody can back- or
+             // forward-date a comment to pin it to the top of the list.
+             && request.resource.data.createdAt == request.time;
+    }
+
+    // -----------------------------------------------------------------
+    //  RECIPES — visitors see published recipes only, admins see all.
+    //
+    //  Because of the `published` condition, an unfiltered read of this
+    //  collection is REFUSED for visitors: the public listener has to ask
+    //  for  where('published','==',true)  — see RecipesContext.jsx.
+    //  The dashboard reads everything, which the isAdmin() branch allows.
+    // -----------------------------------------------------------------
+    match /recipes/{recipeId} {
+      allow read: if isAdmin() || resource.data.published == true;
+      allow create, update, delete: if isAdmin();
+
+      // ---------------------------------------------------------------
+      //  COMMENTS — anyone can read and post on a visible recipe,
+      //  nobody can edit, only an admin can delete (moderation).
+      // ---------------------------------------------------------------
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isValidComment() && recipeIsPublic(recipeId);
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // -----------------------------------------------------------------
+    //  REACTIONS — public like / dislike counters, one doc per recipe.
+    //  Writes are restricted to two non-negative integers that may only
+    //  move by 1 at a time, and only for a recipe that really exists —
+    //  otherwise anyone could fill the database with junk documents.
+    // -----------------------------------------------------------------
+    match /reactions/{recipeId} {
+      allow read: if true;
+
+      allow create, update: if recipeExists(recipeId)
+                   && request.resource.data.keys().hasOnly(['likes', 'dislikes'])
+                   && request.resource.data.keys().hasAll(['likes', 'dislikes'])
+                   && request.resource.data.likes is int
+                   && request.resource.data.dislikes is int
+                   && request.resource.data.likes >= 0
+                   && request.resource.data.dislikes >= 0
+                   && likeDelta() <= 1 && likeDelta() >= -1
+                   && dislikeDelta() <= 1 && dislikeDelta() >= -1
+                   // a write that changes nothing is pointless traffic
+                   && (likeDelta() != 0 || dislikeDelta() != 0);
+
+      allow delete: if isAdmin();
+    }
+
+    // Everything else is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

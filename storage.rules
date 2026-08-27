@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// =====================================================================
+//  AVO COOKS — Cloud Storage Security Rules  (recipe photos)
+//
+//  HOW TO PUBLISH (either way works):
+//    A) Firebase Console → Storage → Rules → paste → Publish
+//    B) from the project root:  npx firebase-tools deploy --only storage
+//
+//  Photo uploads from the admin dashboard land in  recipe-images/.
+//  If Storage is not enabled on your Firebase plan, the dashboard
+//  falls back to pasting an image URL — nothing breaks.
+// =====================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null
+             && request.auth.token.email.lower() in [
+                  'mustapha.harb02@gmail.com'
+                ];
+    }
+
+    match /recipe-images/{fileName} {
+      // Everyone can see the photos on the website
+      allow read: if true;
+
+      // Only an admin may upload, max 5 MB, images only.
+      // create/update are listed separately from delete because a delete
+      // carries no request.resource — folding them together would make
+      // the size check fail and silently block every deletion.
+      allow create, update: if isAdmin()
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+
+      allow delete: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
