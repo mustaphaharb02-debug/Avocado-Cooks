@@ -1,14 +1,19 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
+  connectAuthEmulator,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
 } from 'firebase/auth'
-import { app, isAdminEmail } from '../firebase'
+import { app, isAdminEmail, usingEmulators } from '../firebase'
 
 export const auth = getAuth(app)
+
+if (usingEmulators) {
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true })
+}
 
 const AuthContext = createContext(null)
 

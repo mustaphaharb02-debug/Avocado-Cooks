@@ -7,9 +7,25 @@ import {
   setDoc,
   writeBatch,
 } from 'firebase/firestore'
-import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from 'firebase/storage'
+import {
+  connectStorageEmulator,
+  getDownloadURL,
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+} from 'firebase/storage'
 
-import { app, db } from '../firebase'
+import { app, db, usingEmulators } from '../firebase'
+
+let storageInstance = null
+
+function storage() {
+  if (!storageInstance) {
+    storageInstance = getStorage(app)
+    if (usingEmulators) connectStorageEmulator(storageInstance, '127.0.0.1', 9199)
+  }
+  return storageInstance
+}
 import { recipes as seedRecipes } from '../data/recipes'
 
 /** How many recipes ship inside the code, for the dashboard's wording. */
@@ -78,9 +94,7 @@ export async function uploadRecipeImage(file) {
 
   const cleanName = file.name.toLowerCase().replace(SAFE_NAME, '-')
   const path = `recipe-images/${Date.now()}-${cleanName}`
-  const storage = getStorage(app)
-
-  const snapshot = await uploadBytes(storageRef(storage, path), file, {
+  const snapshot = await uploadBytes(storageRef(storage(), path), file, {
     contentType: file.type,
     cacheControl: 'public, max-age=31536000, immutable',
   })

@@ -1,7 +1,7 @@
 // Auth and Storage are imported by the admin code only, so visitors never
 // download them — see src/context/AuthContext.jsx and src/lib/adminApi.js.
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 
 // Firebase web config is public by design — it only identifies the project.
 // Real protection lives in firestore.rules / storage.rules.
@@ -21,6 +21,18 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
+
+// Local development against the Firebase emulators: `npm run dev:emulated`.
+// The flag lives in .env.local, which is git-ignored and never set on a
+// deployed build, so a real visitor can never end up pointed at localhost.
+// Referenced directly (not through `env`) so Vite can replace it at build
+// time and drop the whole branch from the production bundle.
+export const usingEmulators = import.meta.env.VITE_USE_EMULATORS === '1'
+
+if (usingEmulators) {
+  connectFirestoreEmulator(db, '127.0.0.1', 8080)
+  console.info('[firebase] using local emulators')
+}
 
 // Who may open the admin dashboard. Keep this list in sync with the
 // isAdmin() e-mail list inside firestore.rules and storage.rules —

@@ -102,6 +102,41 @@ Node 20+ (`.nvmrc`).
 
 ---
 
+## 🧪 Testing the security rules
+
+The rules are the whole security system — the browser talks to the database
+directly, so nothing else stands between a stranger and the data. They have a
+test suite that runs against the Firebase emulators, no internet or real
+project needed.
+
+```bash
+npm run emulators        # one terminal (needs Java)
+npm run test:rules       # another
+```
+
+48 checks: that hidden recipes stay hidden, that an unfiltered read of the
+collection is refused, that comments cannot be back-dated or given extra
+fields, that likes can only move by one and only on a recipe that exists, that
+photos are admin-only, and that everything outside those paths is closed.
+
+To click around a full copy of the site with a throwaway database:
+
+```bash
+npm run emulators
+npm run dev:emulated
+```
+
+Create a test admin in the Auth emulator first:
+
+```bash
+curl -X POST "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=any" -H "Content-Type: application/json" -d "{\"email\":\"mustapha.harb02@gmail.com\",\"password\":\"whatever\",\"returnSecureToken\":true}"
+```
+
+Nothing here touches the real project: `.env.emulated` only applies to
+`dev:emulated`, and the emulators forget everything when they stop.
+
+---
+
 ## 🌍 Deploying
 
 The site is a folder of static files, so any static host works. Two are
