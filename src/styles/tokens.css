@@ -1,0 +1,42 @@
+/* =============================================
+   AVO COOKS — Design tokens
+   Every colour, shadow, radius and font in the site starts here.
+   Change a value once and it changes everywhere.
+   ============================================= */
+
+:root {
+  --green-dark: #4a7c59;
+  --green-mid: #6aab7e;
+  --green-soft: #a8d5a2;
+  --green-pale: #d4edda;
+  --green-mist: #eef7ee;
+
+  --cream: #fdf8f0;
+  --beige: #f5efe0;
+  --beige-dark: #e8dcc8;
+  --yellow-soft: #f9e9a0;
+  --yellow-warm: #f4c842;
+  --brown-light: #c4956a;
+  --brown-mid: #9b6b47;
+  --brown-dark: #5c3d2e;
+
+  --text-dark: #2d2417;
+  --text-mid: #6b5b45;
+  --text-light: #9e8b74;
+  --white: #ffffff;
+
+  --shadow-soft: 0 4px 20px rgba(74, 124, 89, 0.10);
+  --shadow-card: 0 8px 32px rgba(74, 124, 89, 0.13);
+  --shadow-hover: 0 16px 48px rgba(74, 124, 89, 0.20);
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --radius-pill: 999px;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Nunito', sans-serif;
+  --font-arabic: 'Noto Kufi Arabic', sans-serif;
+
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

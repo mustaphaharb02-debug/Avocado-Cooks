@@ -1,0 +1,96 @@
+/* =============================================
+   AVO COOKS — Shared classes
+   Used by more than one component or page. Anything in here is
+   deliberately global; everything else belongs in a component's
+   own stylesheet, next to the component.
+
+   Imported before component styles, so a component can always
+   override one of these rules locally.
+   ============================================= */
+
+/* Buttons — the site's call-to-action style */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: var(--radius-pill);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn--primary {
+  background: var(--green-dark);
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(74,124,89,0.3);
+}
+
+.btn--primary:hover {
+  background: var(--green-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(74,124,89,0.35);
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--green-dark);
+  color: var(--green-dark);
+}
+
+.btn--outline:hover {
+  background: var(--green-pale);
+  transform: translateY(-2px);
+}
+
+/* The recipe grid, shared by the home page and the recipes page */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .recipe-grid { grid-template-columns: 1fr; }
+}
+
+/* The little green bullet used for ingredients and empty states */
+.ingredient-dot {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-right: 10px;
+  color: #5d8f63;
+}
+
+/* Loading + empty states for recipe data */
+.page-state {
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--text-light);
+  padding: 40px 20px;
+}
+
+.page-state__icon {
+  font-size: 2.4rem;
+  animation: routePulse 1.2s ease-in-out infinite;
+}
+
+/* Inline warning used when a like could not be saved */
+.reaction-error {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #a94734;
+  background: #fbe6e0;
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  display: inline-block;
+}

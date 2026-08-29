@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useLang } from '../context/LanguageContext'
+import { useLang } from '../i18n/LanguageContext'
 import './Footer.css'
 
 export default function Footer() {

@@ -273,9 +273,3 @@
   .recipe-details__body { grid-template-columns: 1fr; }
   .recipe-details__img-wrap { aspect-ratio: 4/3; }
 }
-.ingredient-dot {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-right: 10px;
-  color: #5d8f63;
-}

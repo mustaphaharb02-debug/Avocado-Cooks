@@ -1,9 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Hero from '../components/Hero'
-import RecipeCard from '../components/RecipeCard'
-import { useLang } from '../context/LanguageContext'
-import { useRecipes, useFeaturedRecipes } from '../context/RecipesContext'
+import RecipeCard from '../features/recipes/RecipeCard'
+import RecipeImage from '../features/recipes/RecipeImage'
+import { useLang } from '../i18n/LanguageContext'
+import { useRecipes, useFeaturedRecipes } from '../features/recipes/RecipesContext'
 import './HomePage.css'
 
 export default function HomePage() {
@@ -74,17 +75,12 @@ export default function HomePage() {
 }
 
 function GalleryThumb({ recipe }) {
-  const [err, setErr] = React.useState(false)
-  return err || !recipe.image ? (
-    <div className="gallery-thumb__placeholder">🥑</div>
-  ) : (
-    <img
+  return (
+    <RecipeImage
       src={recipe.image}
-      alt=""
       className="gallery-thumb__img"
-      loading="lazy"
-      decoding="async"
-      onError={() => setErr(true)}
+      fallbackClassName="gallery-thumb__placeholder"
+      fallback="🥑"
     />
   )
 }

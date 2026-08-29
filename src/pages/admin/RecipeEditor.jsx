@@ -1,10 +1,12 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useState } from 'react'
+
 import {
   listToText,
   textToList,
   validateRecipe,
-} from '../../lib/recipeModel'
-import { uploadRecipeImage, uploadErrorMessage } from '../../lib/adminApi'
+} from '../../features/recipes/recipeModel'
+import RecipeEditorPhoto from './RecipeEditorPhoto'
+import RecipeEditorLangTab from './RecipeEditorLangTab'
 
 const LANG_TABS = [
   { key: 'en', label: '🇬🇧 English' },
@@ -12,8 +14,15 @@ const LANG_TABS = [
 ]
 
 /**
- * The add / edit form. Lists (ingredients, steps) are edited as plain
- * text — one item per line — which is far easier than a JSON array.
+ * The add / edit form.
+ *
+ * This file owns the draft recipe and what happens when you press Save.
+ * The photo controls live in RecipeEditorPhoto, and everything inside a
+ * language tab lives in RecipeEditorLangTab — both were making this file
+ * hard to read.
+ *
+ * Lists (ingredients, steps) are held as plain text while you edit — one
+ * item per line — and turned back into lists on save.
  */
 export default function RecipeEditor({ initial, existingRecipes, onSave, onCancel, isNew }) {
   const [draft, setDraft] = useState(() => ({
@@ -26,8 +35,6 @@ export default function RecipeEditor({ initial, existingRecipes, onSave, onCance
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [uploading, setUploading] = useState(false)
-  const [uploadError, setUploadError] = useState('')
-  const fileInput = useRef(null)
 
   const categories = useMemo(
     () => [...new Set(existingRecipes.map((r) => r.category).filter(Boolean))].sort(),
@@ -53,24 +60,6 @@ export default function RecipeEditor({ initial, existingRecipes, onSave, onCance
     ar: { ...draft.ar, ingredients: textToList(draft.ar.ingredients), steps: textToList(draft.ar.steps) },
   })
 
-  const handleUpload = async (event) => {
-    const file = event.target.files?.[0]
-    event.target.value = '' // let the same file be picked again after an error
-    if (!file) return
-
-    setUploading(true)
-    setUploadError('')
-    try {
-      const url = await uploadRecipeImage(file)
-      set({ image: url })
-    } catch (err) {
-      console.error('[admin] image upload failed:', err)
-      setUploadError(uploadErrorMessage(err))
-    } finally {
-      setUploading(false)
-    }
-  }
-
   const handleSubmit = async (event) => {
     event.preventDefault()
     const recipe = toRecipe()
@@ -91,7 +80,6 @@ export default function RecipeEditor({ initial, existingRecipes, onSave, onCance
     }
   }
 
-  const side = draft[tab]
   const isArabic = tab === 'ar'
 
   return (
@@ -168,55 +156,13 @@ export default function RecipeEditor({ initial, existingRecipes, onSave, onCance
       </div>
 
       {/* ---------- photo ---------- */}
-      <div className="admin-card">
-        <h3 className="admin-card__title">Photo</h3>
-        <div className="admin-photo">
-          <div className="admin-photo__preview">
-            {draft.image ? (
-              <img src={draft.image} alt="" onError={(e) => { e.currentTarget.style.opacity = 0.15 }} />
-            ) : (
-              <span>🥑</span>
-            )}
-          </div>
-
-          <div className="admin-photo__controls">
-            <button
-              type="button"
-              className="admin-btn admin-btn--soft"
-              onClick={() => fileInput.current?.click()}
-              disabled={uploading}
-            >
-              {uploading ? 'Uploading…' : '📤 Upload a photo'}
-            </button>
-            <input
-              ref={fileInput}
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleUpload}
-            />
-
-            <label className="admin-field">
-              <span className="admin-field__label">…or paste an image link / path</span>
-              <input
-                className="admin-input"
-                list="admin-images"
-                placeholder="/images/my-dish.jpg or https://…"
-                value={draft.image}
-                onChange={(e) => set({ image: e.target.value })}
-              />
-              <datalist id="admin-images">
-                {imageSuggestions.map((i) => (
-                  <option key={i} value={i} />
-                ))}
-              </datalist>
-            </label>
-
-            {uploadError && <p className="admin-alert admin-alert--warn">{uploadError}</p>}
-            {errors.image && <span className="admin-field__error">{errors.image}</span>}
-          </div>
-        </div>
-      </div>
+      <RecipeEditorPhoto
+        image={draft.image}
+        suggestions={imageSuggestions}
+        error={errors.image}
+        onChange={(image) => set({ image })}
+        onUploadingChange={setUploading}
+      />
 
       {/* ---------- language tabs ---------- */}
       <div className="admin-card">
@@ -233,60 +179,11 @@ export default function RecipeEditor({ initial, existingRecipes, onSave, onCance
           ))}
         </div>
 
-        <div className="admin-lang-body" dir={isArabic ? 'rtl' : 'ltr'}>
-          <label className="admin-field">
-            <span className="admin-field__label">{isArabic ? 'اسم الوصفة' : 'Title'}</span>
-            <input
-              className="admin-input"
-              value={side.title}
-              onChange={(e) => setLang(tab, { title: e.target.value })}
-            />
-          </label>
-
-          <label className="admin-field">
-            <span className="admin-field__label">{isArabic ? 'وصف قصير' : 'Short description'}</span>
-            <textarea
-              className="admin-input admin-input--area"
-              rows={2}
-              value={side.description}
-              onChange={(e) => setLang(tab, { description: e.target.value })}
-            />
-          </label>
-
-          <label className="admin-field">
-            <span className="admin-field__label">
-              {isArabic ? 'المكونات — مكون في كل سطر' : 'Ingredients — one per line'}
-            </span>
-            <textarea
-              className="admin-input admin-input--area"
-              rows={8}
-              value={side.ingredients}
-              onChange={(e) => setLang(tab, { ingredients: e.target.value })}
-            />
-          </label>
-
-          <label className="admin-field">
-            <span className="admin-field__label">
-              {isArabic ? 'خطوات التحضير — خطوة في كل سطر' : 'Steps — one per line'}
-            </span>
-            <textarea
-              className="admin-input admin-input--area"
-              rows={8}
-              value={side.steps}
-              onChange={(e) => setLang(tab, { steps: e.target.value })}
-            />
-          </label>
-
-          <label className="admin-field">
-            <span className="admin-field__label">{isArabic ? 'ملاحظات (اختياري)' : 'Notes (optional)'}</span>
-            <textarea
-              className="admin-input admin-input--area"
-              rows={2}
-              value={side.notes}
-              onChange={(e) => setLang(tab, { notes: e.target.value })}
-            />
-          </label>
-        </div>
+        <RecipeEditorLangTab
+          side={draft[tab]}
+          isArabic={isArabic}
+          onChange={(patch) => setLang(tab, patch)}
+        />
 
         {(errors.title || errors.ingredients || errors.steps) && (
           <p className="admin-alert admin-alert--error">

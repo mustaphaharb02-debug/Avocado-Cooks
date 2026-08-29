@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot, query, where } from 'firebase/firestore'
-import { db } from '../firebase'
-import { recipes as seedRecipes } from '../data/recipes'
-import { normalizeRecipe } from '../lib/recipeModel'
+import { db } from '../../firebase'
+import { recipes as seedRecipes } from './seedRecipes'
+import { normalizeRecipe } from './recipeModel'
 
 // Recipes live in Firestore so they can be managed from /admin.
 //
@@ -13,9 +13,9 @@ import { normalizeRecipe } from '../lib/recipeModel'
 // Dropping the where() clause here would break the whole website.
 //
 // The dashboard needs hidden recipes too, so it runs its own listener in
-// src/pages/admin/useAdminRecipes.js — inside the admin-only chunk.
+// src/features/recipes/useAdminRecipes.js — inside the admin-only chunk.
 //
-// The built-in list in src/data/recipes.js is kept as a seed (the admin
+// The built-in list in seedRecipes.js is kept as a seed (the admin
 // dashboard can import it) and as an offline fallback, so the website
 // never shows an empty page if Firestore is unreachable.
 

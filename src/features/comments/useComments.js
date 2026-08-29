@@ -11,13 +11,13 @@ import {
   serverTimestamp,
 } from 'firebase/firestore'
 
-import { db } from '../firebase'
+import { db } from '../../firebase'
 
 export const NAME_MAX = 50
 export const TEXT_MAX = 1000
 
 /** Comments for one recipe, stored at recipes/{recipeId}/comments. */
-export default function useFirebaseComments(recipeId) {
+export default function useComments(recipeId) {
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)

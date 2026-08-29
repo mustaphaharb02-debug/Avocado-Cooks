@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import useFirebaseComments from '../../hooks/useFirebaseComments'
-import { firestoreErrorMessage } from '../../lib/adminApi'
+import useComments from './useComments'
+import { firestoreErrorMessage } from '../recipes/recipesApi'
 
 /** Read and moderate the comments of one recipe. */
 export default function CommentsPanel({ recipe, onClose }) {
-  const { comments, deleteComment, loading, error } = useFirebaseComments(recipe.id)
+  const { comments, deleteComment, loading, error } = useComments(recipe.id)
   const [busyId, setBusyId] = useState(null)
   const [actionError, setActionError] = useState('')
 

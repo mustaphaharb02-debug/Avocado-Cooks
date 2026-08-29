@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { useLang } from '../context/LanguageContext'
-import useFirebaseComments, { NAME_MAX, TEXT_MAX } from '../hooks/useFirebaseComments'
+import { useLang } from '../../i18n/LanguageContext'
+import useComments, { NAME_MAX, TEXT_MAX } from './useComments'
 import './CommentSection.css'
 
 export default function CommentSection({ recipeId }) {
   const { t, isRTL } = useLang()
 
-  const { comments, addComment, loading, error } = useFirebaseComments(recipeId)
+  const { comments, addComment, loading, error } = useComments(recipeId)
 
   const [name, setName] = useState('')
   const [text, setText] = useState('')

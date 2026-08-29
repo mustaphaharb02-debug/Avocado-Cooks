@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react'
 import { collection, doc, onSnapshot, runTransaction } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db } from '../../firebase'
 
 // =====================================================================
 //  Likes / dislikes
@@ -23,7 +23,7 @@ import { db } from '../firebase'
 
 const VOTES_KEY = 'avo-cooks:my-votes'
 
-const ReactionsContext = createContext(null)
+const LikesContext = createContext(null)
 
 function readVotes() {
   try {
@@ -45,7 +45,7 @@ function writeVotes(votes) {
 
 const EMPTY = { likes: 0, dislikes: 0 }
 
-export function ReactionsProvider({ children }) {
+export function LikesProvider({ children }) {
   const [counts, setCounts] = useState({}) // { [recipeId]: { likes, dislikes } }
   const [votes, setVotes] = useState(readVotes)
   const [error, setError] = useState(null)
@@ -151,11 +151,11 @@ export function ReactionsProvider({ children }) {
     [counts, votes, vote, error, pending]
   )
 
-  return <ReactionsContext.Provider value={value}>{children}</ReactionsContext.Provider>
+  return <LikesContext.Provider value={value}>{children}</LikesContext.Provider>
 }
 
-export function useReactionsContext() {
-  const ctx = useContext(ReactionsContext)
-  if (!ctx) throw new Error('useReactionsContext must be used inside <ReactionsProvider>')
+export function useLikesContext() {
+  const ctx = useContext(LikesContext)
+  if (!ctx) throw new Error('useLikesContext must be used inside <LikesProvider>')
   return ctx
 }

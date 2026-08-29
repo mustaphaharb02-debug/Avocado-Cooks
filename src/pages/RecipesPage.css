@@ -137,12 +137,6 @@
   padding: 48px 24px 80px;
 }
 
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 28px;
-  width: 100%;
-}
 
 /* Empty */
 .recipes-page__empty {
@@ -167,6 +161,5 @@
 
 @media (max-width: 600px) {
   .recipes-page__header { padding: 48px 16px 40px; }
-  .recipe-grid { grid-template-columns: 1fr; }
   .recipes-page__grid-wrap { padding: 32px 16px 60px; }
 }

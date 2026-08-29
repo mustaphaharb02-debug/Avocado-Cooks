@@ -1,15 +1,22 @@
 // =============================================
-//  AVO COOKS — Recipe Data
-//  ✏️  ADD OR EDIT YOUR RECIPES HERE
+//  AVO COOKS — The recipes that ship inside the code
 //
-//  Each recipe must have:
-//    id          — unique number
-//    image       — path like "/images/recipe-name.jpg"
+//  This file has TWO jobs, and it helps to know which is which:
+//
+//    1. SEED — the dashboard's "Import the built-in recipes" button
+//       copies these into Firestore, once, when the database is empty.
+//    2. FALLBACK — if Firestore cannot be reached, the website shows
+//       these instead of an empty page.
+//
+//  After you import, the DATABASE is the real source of truth. Editing
+//  a recipe here will NOT change the live site — edit it in /admin.
+//  This list stays frozen at the original recipes on purpose.
+//
+//  Each recipe has:
+//    id          — unique number, also used in the recipe's web address
+//    image       — path like "/images/recipe-name.jpg"  (put files in public/images/)
 //    category    — e.g. "Chicken", "Vegetarian", "Pastry"
-//    en          — English fields
-//    ar          — Arabic fields
-//
-//  Place recipe images in:  public/images/
+//    en / ar     — title, description, ingredients[], steps[], notes
 // =============================================
 
 export const recipes = [

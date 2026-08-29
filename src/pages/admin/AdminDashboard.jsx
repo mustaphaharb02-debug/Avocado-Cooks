@@ -2,32 +2,32 @@ import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useAuth } from '../../context/AuthContext'
-import useAdminRecipes from './useAdminRecipes'
-import { useReactionsContext } from '../../context/ReactionsContext'
-import {
-  deleteRecipe,
-  firestoreErrorMessage,
-  importSeedRecipes,
-  saveRecipe,
-  SEED_RECIPE_COUNT,
-} from '../../lib/adminApi'
-import { emptyRecipe, nextRecipeId } from '../../lib/recipeModel'
+import useAdminRecipes from '../../features/recipes/useAdminRecipes'
+import { useLikesContext } from '../../features/likes/LikesContext'
+import { firestoreErrorMessage, SEED_RECIPE_COUNT } from '../../features/recipes/recipesApi'
+import { emptyRecipe, nextRecipeId } from '../../features/recipes/recipeModel'
+import CommentsPanel from '../../features/comments/CommentsPanel'
 import RecipeEditor from './RecipeEditor'
-import CommentsPanel from './CommentsPanel'
+import RecipeRow from './RecipeRow'
+import useDashboardActions from './useDashboardActions'
 import './Admin.css'
 
+/**
+ * The recipe manager. This file lays out the screen; the writes it
+ * performs live in useDashboardActions, and one row of the list lives
+ * in RecipeRow.
+ */
 export default function AdminDashboard() {
   const { user, logout } = useAuth()
   const { allRecipes, loading, error, isEmpty, usingFallback } = useAdminRecipes()
-  const { counts } = useReactionsContext()
+  const { counts } = useLikesContext()
+  const { busy, notice, problem, clearMessages, save, remove, toggleFlag, importSeed } =
+    useDashboardActions()
 
   const [editing, setEditing] = useState(null) // recipe draft or null
   const [isNew, setIsNew] = useState(false)
   const [commentsFor, setCommentsFor] = useState(null)
   const [search, setSearch] = useState('')
-  const [notice, setNotice] = useState('')
-  const [problem, setProblem] = useState('')
-  const [busy, setBusy] = useState(false)
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -41,76 +41,20 @@ export default function AdminDashboard() {
   }, [allRecipes, search])
 
   const startNew = () => {
-    setProblem('')
-    setNotice('')
+    clearMessages()
     setEditing(emptyRecipe(nextRecipeId(allRecipes)))
     setIsNew(true)
   }
 
   const startEdit = (recipe) => {
-    setProblem('')
-    setNotice('')
+    clearMessages()
     setEditing(recipe)
     setIsNew(false)
   }
 
   const handleSave = async (recipe) => {
-    try {
-      await saveRecipe(recipe)
-      setEditing(null)
-      setNotice(`Saved “${recipe.en.title || recipe.ar.title}”. It is live on the website now.`)
-    } catch (err) {
-      console.error('[admin] save failed:', err)
-      throw new Error(firestoreErrorMessage(err))
-    }
-  }
-
-  const handleDelete = async (recipe) => {
-    const name = recipe.en.title || recipe.ar.title
-    if (!window.confirm(`Delete “${name}”? This cannot be undone.`)) return
-
-    setBusy(true)
-    setProblem('')
-    try {
-      await deleteRecipe(recipe.id)
-      setNotice(`Deleted “${name}”.`)
-    } catch (err) {
-      setProblem(firestoreErrorMessage(err))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const toggleFlag = async (recipe, field) => {
-    setBusy(true)
-    setProblem('')
-    try {
-      await saveRecipe({ ...recipe, [field]: !recipe[field] })
-    } catch (err) {
-      setProblem(firestoreErrorMessage(err))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const handleImport = async () => {
-    if (
-      !window.confirm(
-        `Copy the ${SEED_RECIPE_COUNT} built-in recipes into the database? Existing ones are kept.`
-      )
-    ) {
-      return
-    }
-    setBusy(true)
-    setProblem('')
-    try {
-      const { imported, skipped } = await importSeedRecipes()
-      setNotice(`Imported ${imported} recipe(s). ${skipped ? `${skipped} already existed.` : ''}`)
-    } catch (err) {
-      setProblem(firestoreErrorMessage(err))
-    } finally {
-      setBusy(false)
-    }
+    await save(recipe)
+    setEditing(null)
   }
 
   return (
@@ -146,9 +90,9 @@ export default function AdminDashboard() {
         {isEmpty && !editing && (
           <div className="admin-alert admin-alert--info">
             <strong>The database has no recipes yet.</strong> The website is currently showing the
-            {SEED_RECIPE_COUNT} recipes bundled in the code. Import them once, then you can edit
+            {' '}{SEED_RECIPE_COUNT} recipes bundled in the code. Import them once, then you can edit
             everything here.
-            <button className="admin-btn admin-btn--sm" onClick={handleImport} disabled={busy}>
+            <button className="admin-btn admin-btn--sm" onClick={importSeed} disabled={busy}>
               📥 Import the built-in recipes
             </button>
           </div>
@@ -192,71 +136,18 @@ export default function AdminDashboard() {
               <p className="admin-empty">No recipe matches “{search}”.</p>
             ) : (
               <ul className="admin-list">
-                {filtered.map((recipe) => {
-                  const reaction = counts[String(recipe.id)] ?? { likes: 0, dislikes: 0 }
-                  return (
-                    <li key={recipe.id} className={`admin-row ${recipe.published ? '' : 'is-hidden'}`}>
-                      <div className="admin-row__thumb">
-                        {recipe.image ? (
-                          <img src={recipe.image} alt="" loading="lazy" />
-                        ) : (
-                          <span>🥑</span>
-                        )}
-                      </div>
-
-                      <div className="admin-row__main">
-                        <div className="admin-row__titles">
-                          <strong>{recipe.en.title || '—'}</strong>
-                          <span dir="rtl">{recipe.ar.title || '—'}</span>
-                        </div>
-                        <div className="admin-row__meta">
-                          <span className="admin-chip">#{recipe.id}</span>
-                          <span className="admin-chip">{recipe.category}</span>
-                          <span className="admin-chip admin-chip--quiet">
-                            💚 {reaction.likes} · ✕ {reaction.dislikes}
-                          </span>
-                          {recipe.featured && <span className="admin-chip admin-chip--star">⭐ homepage</span>}
-                          {!recipe.published && <span className="admin-chip admin-chip--off">hidden</span>}
-                        </div>
-                      </div>
-
-                      <div className="admin-row__actions">
-                        <button
-                          className="admin-btn admin-btn--soft admin-btn--sm"
-                          onClick={() => toggleFlag(recipe, 'featured')}
-                          disabled={busy}
-                          title="Show or hide on the homepage"
-                        >
-                          {recipe.featured ? '⭐ Featured' : '☆ Feature'}
-                        </button>
-                        <button
-                          className="admin-btn admin-btn--soft admin-btn--sm"
-                          onClick={() => toggleFlag(recipe, 'published')}
-                          disabled={busy}
-                          title="Show or hide on the website"
-                        >
-                          {recipe.published ? '👁 Visible' : '🚫 Hidden'}
-                        </button>
-                        <button
-                          className="admin-btn admin-btn--soft admin-btn--sm"
-                          onClick={() => setCommentsFor(recipe)}
-                        >
-                          💬 Comments
-                        </button>
-                        <button className="admin-btn admin-btn--sm" onClick={() => startEdit(recipe)}>
-                          ✏️ Edit
-                        </button>
-                        <button
-                          className="admin-btn admin-btn--danger admin-btn--sm"
-                          onClick={() => handleDelete(recipe)}
-                          disabled={busy}
-                        >
-                          🗑
-                        </button>
-                      </div>
-                    </li>
-                  )
-                })}
+                {filtered.map((recipe) => (
+                  <RecipeRow
+                    key={recipe.id}
+                    recipe={recipe}
+                    reaction={counts[String(recipe.id)] ?? { likes: 0, dislikes: 0 }}
+                    busy={busy}
+                    onToggleFlag={toggleFlag}
+                    onComments={setCommentsFor}
+                    onEdit={startEdit}
+                    onDelete={remove}
+                  />
+                ))}
               </ul>
             )}
           </>

@@ -15,7 +15,7 @@ import {
   uploadBytes,
 } from 'firebase/storage'
 
-import { app, db, usingEmulators } from '../firebase'
+import { app, db, usingEmulators } from '../../firebase'
 
 let storageInstance = null
 
@@ -26,7 +26,7 @@ function storage() {
   }
   return storageInstance
 }
-import { recipes as seedRecipes } from '../data/recipes'
+import { recipes as seedRecipes } from './seedRecipes'
 
 /** How many recipes ship inside the code, for the dashboard's wording. */
 export const SEED_RECIPE_COUNT = seedRecipes.length
@@ -52,7 +52,7 @@ export async function deleteRecipe(recipeId) {
   await deleteDoc(doc(db, 'recipes', String(recipeId)))
 }
 
-/** Copies the recipes bundled in src/data/recipes.js into Firestore. */
+/** Copies the recipes bundled in seedRecipes.js into Firestore. */
 export async function importSeedRecipes({ overwrite = false } = {}) {
   const snapshot = await getDocs(collection(db, 'recipes'))
   const existing = new Set(snapshot.docs.map((d) => d.id))

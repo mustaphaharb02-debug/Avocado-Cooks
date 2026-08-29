@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 
 import { db } from '../../firebase'
-import { fallbackRecipes } from '../../context/RecipesContext'
-import { normalizeRecipe } from '../../lib/recipeModel'
+import { fallbackRecipes } from './RecipesContext'
+import { normalizeRecipe } from './recipeModel'
 
 // The dashboard's own view of the recipes collection.
 //

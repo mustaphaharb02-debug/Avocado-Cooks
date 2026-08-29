@@ -350,6 +350,41 @@ await check('writing outside recipe-images is refused', () =>
   assertFails(uploadBytes(ref(admin.storage(), 'elsewhere/file.png'), png, imageMeta))
 )
 
+// ------------------------------------------------- admin list stays in sync
+
+// The admin e-mail is written in three places that must agree: the two
+// rules files, and the app's own list (which decides who is SHOWN the
+// dashboard). If they drift you get the worst kind of bug — a dashboard
+// that opens and then refuses every save. This catches that.
+
+group('the admin list agrees across all three files')
+
+function adminEmailsIn(file) {
+  const text = readFileSync(file, 'utf8')
+  return new Set(
+    [...text.matchAll(/[\w.+-]+@[\w-]+\.[\w.]+/g)]
+      .map((m) => m[0].toLowerCase())
+      // only the addresses inside an isAdmin()/ADMIN_EMAILS list, not ones in prose
+      .filter((e) => !text.includes('// ' + e))
+  )
+}
+
+const inFirestore = adminEmailsIn('firestore.rules')
+const inStorage = adminEmailsIn('storage.rules')
+const inApp = adminEmailsIn('src/firebase.js')
+
+await check('firestore.rules and storage.rules list the same admins', () => {
+  const a = [...inFirestore].sort().join(', ')
+  const b = [...inStorage].sort().join(', ')
+  if (a !== b) throw new Error(`firestore.rules has [${a}] but storage.rules has [${b}]`)
+})
+
+await check('the app list matches the rules', () => {
+  const a = [...inFirestore].sort().join(', ')
+  const b = [...inApp].sort().join(', ')
+  if (a !== b) throw new Error(`rules allow [${a}] but src/firebase.js shows the dashboard to [${b}]`)
+})
+
 // ----------------------------------------------------------------- report
 
 await testEnv.cleanup()

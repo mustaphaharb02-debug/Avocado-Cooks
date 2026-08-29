@@ -1,6 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
-
-const LanguageContext = createContext()
+// =============================================
+//  AVO COOKS — Every word the interface says
+//
+//  Two dictionaries with identical keys. Add a key to one, add it
+//  to the other, or that phrase disappears in the second language.
+//  The provider that serves these lives in LanguageContext.jsx.
+// =============================================
 
 export const translations = {
   en: {
@@ -65,42 +69,20 @@ export const translations = {
   },
 }
 
-const LANG_KEY = 'avo-cooks:lang'
-
-function initialLang() {
-  try {
-    const saved = localStorage.getItem(LANG_KEY)
-    if (saved === 'en' || saved === 'ar') return saved
-  } catch {
-    // private browsing — fall through to the browser language
-  }
-  return typeof navigator !== 'undefined' && navigator.language?.startsWith('ar') ? 'ar' : 'en'
+// Category names are typed freely on each recipe (in English), so they
+// need their own small dictionary. A category with no entry here simply
+// shows its own name — nothing breaks.
+export const categoryNames = {
+  ar: {
+    All: 'الكل',
+    Chicken: 'دجاج',
+    Vegetarian: 'نباتي',
+    Soup: 'شوربة',
+    Pastry: 'معجنات',
+    Pasta: 'باستا',
+    Salad: 'سلطة',
+    Dessert: 'حلويات',
+    Breakfast: 'فطور',
+    Seafood: 'مأكولات بحرية',
+  },
 }
-
-export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState(initialLang)
-
-  useEffect(() => {
-    document.body.className = lang === 'ar' ? 'rtl' : 'ltr'
-    document.documentElement.lang = lang
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
-    try {
-      localStorage.setItem(LANG_KEY, lang)
-    } catch {
-      // ignore — the choice just won't survive a refresh
-    }
-  }, [lang])
-
-  const t = translations[lang]
-  const isRTL = lang === 'ar'
-
-  const toggleLang = () => setLang(l => l === 'en' ? 'ar' : 'en')
-
-  return (
-    <LanguageContext.Provider value={{ lang, toggleLang, t, isRTL }}>
-      {children}
-    </LanguageContext.Provider>
-  )
-}
-
-export const useLang = () => useContext(LanguageContext)

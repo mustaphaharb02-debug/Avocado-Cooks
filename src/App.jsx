@@ -1,8 +1,8 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { LanguageProvider } from './context/LanguageContext'
-import { RecipesProvider } from './context/RecipesContext'
-import { ReactionsProvider } from './context/ReactionsContext'
+import { LanguageProvider } from './i18n/LanguageContext'
+import { RecipesProvider } from './features/recipes/RecipesContext'
+import { LikesProvider } from './features/likes/LikesContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -43,7 +43,7 @@ export default function App() {
     <ErrorBoundary>
       <LanguageProvider>
         <RecipesProvider>
-          <ReactionsProvider>
+          <LikesProvider>
             <BrowserRouter>
               <ScrollToTop />
               <Suspense fallback={<div className="route-loading">🥑</div>}>
@@ -56,7 +56,7 @@ export default function App() {
                 </Routes>
               </Suspense>
             </BrowserRouter>
-          </ReactionsProvider>
+          </LikesProvider>
         </RecipesProvider>
       </LanguageProvider>
     </ErrorBoundary>

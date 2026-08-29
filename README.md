@@ -185,22 +185,59 @@ on that domain.
 
 ## 📁 Project structure
 
+The rule: **a page composes, a feature owns.** To change how recipes behave,
+open `features/recipes/`. To change how a page is laid out, open `pages/`.
+
 ```
 src/
-├── components/     Header, Footer, Hero, RecipeCard, CommentSection, …
-├── context/
-│   ├── LanguageContext.jsx   EN/AR + RTL, remembered between visits
-│   ├── RecipesContext.jsx    recipes from Firestore (+ offline fallback)
-│   ├── ReactionsContext.jsx  likes/dislikes — one shared listener
-│   └── AuthContext.jsx       admin sign-in (loaded only on /admin)
-├── hooks/          useFirebaseReactions, useFirebaseComments
-├── lib/            recipeModel (shape + validation), adminApi (writes)
-├── pages/
-│   ├── HomePage, RecipesPage, RecipeDetails
-│   └── admin/      AdminArea, AdminLogin, AdminDashboard, RecipeEditor
-├── data/recipes.js seed + offline fallback
-└── firebase.js     Firebase config and admin e-mail list
+├── main.jsx / App.jsx      start-up and the list of routes
+├── firebase.js             Firebase connection + the admin e-mail list
+│
+├── styles/                 everything global, in load order
+│   ├── tokens.css          colours, fonts, shadows, radii  ← start here to restyle
+│   ├── base.css            reset, page background, RTL/LTR
+│   ├── animations.css      keyframes + .animate-* helpers
+│   └── shared.css          classes used by more than one place
+│                           (.btn · .recipe-grid · .ingredient-dot · .page-state)
+│
+├── i18n/
+│   ├── translations.js     every word the interface says, EN + AR
+│   └── LanguageContext.jsx the toggle, RTL switch, and remembering the choice
+│
+├── features/               each folder owns one idea, end to end
+│   ├── recipes/
+│   │   ├── RecipesContext.jsx   what visitors see (published only)
+│   │   ├── useAdminRecipes.js   what the dashboard sees (everything)
+│   │   ├── recipeModel.js       the shape of a recipe + validation
+│   │   ├── recipesApi.js        every write: save, delete, import, upload
+│   │   ├── seedRecipes.js       the built-in recipes (seed + offline fallback)
+│   │   ├── RecipeCard.jsx       one tile
+│   │   └── RecipeImage.jsx      a photo that falls back gracefully
+│   ├── comments/
+│   │   ├── useComments.js       read + post for one recipe
+│   │   ├── CommentSection.jsx   the public form and list
+│   │   └── CommentsPanel.jsx    moderation, in the dashboard
+│   └── likes/
+│       ├── LikesContext.jsx     ONE listener for every counter on the page
+│       ├── useLikes.js          per-recipe reader
+│       └── LikeButtons.jsx      the 💚 / ✕ pair, small and large
+│
+├── components/             generic UI with no feature of its own
+│   Header · Footer · Hero · ErrorBoundary · RequireAdmin · ScrollToTop
+│
+├── context/AuthContext.jsx admin sign-in (loaded only under /admin)
+├── lib/safePath.js         keeps the post-login redirect on this site
+│
+└── pages/                  layout and composition only
+    ├── HomePage · RecipesPage · RecipeDetails
+    └── admin/  AdminArea · AdminLogin · AdminDashboard
+                RecipeEditor (+ Photo, LangTab) · RecipeRow
+                useDashboardActions.js   what the buttons do
 ```
+
+> **Note on names.** In the code, likes are called *likes*. In the database the
+> collection is still `reactions/{id}` — renaming that would throw away every
+> like on the site, so it deliberately stays as it is.
 
 ---
 

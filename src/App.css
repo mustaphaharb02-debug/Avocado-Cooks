@@ -1,4 +1,9 @@
-/* Shared page wrapper utilities */
+/* =============================================
+   AVO COOKS — App shell
+   Only the frame around the pages lives here. Shared page classes
+   moved to styles/shared.css, animations to styles/animations.css.
+   ============================================= */
+
 .page-wrapper {
   min-height: 100vh;
   padding-top: 72px;
@@ -11,40 +16,6 @@
   place-items: center;
   font-size: 2.2rem;
   animation: routePulse 1.2s ease-in-out infinite;
-}
-
-@keyframes routePulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.55; }
-}
-
-/* Loading + empty states for recipe data */
-.page-state {
-  min-height: 50vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  text-align: center;
-  color: var(--text-light);
-  padding: 40px 20px;
-}
-
-.page-state__icon {
-  font-size: 2.4rem;
-  animation: routePulse 1.2s ease-in-out infinite;
-}
-
-/* Inline warning used when a like could not be saved */
-.reaction-error {
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: #a94734;
-  background: #fbe6e0;
-  border-radius: var(--radius-pill);
-  padding: 4px 12px;
-  display: inline-block;
 }
 
 /* Error boundary screen */

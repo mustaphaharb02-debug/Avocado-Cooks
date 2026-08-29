@@ -33,12 +33,6 @@
 }
 
 /* Grid */
-.recipe-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 28px;
-  width: 100%;
-}
 
 .featured-section__cta {
   margin-top: 8px;
@@ -148,6 +142,5 @@
 
 @media (max-width: 600px) {
   .featured-section { padding: 60px 16px 40px; }
-  .recipe-grid { grid-template-columns: 1fr; }
   .gallery-banner { padding: 60px 16px; }
 }

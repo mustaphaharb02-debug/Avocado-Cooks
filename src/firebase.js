@@ -1,5 +1,5 @@
 // Auth and Storage are imported by the admin code only, so visitors never
-// download them — see src/context/AuthContext.jsx and src/lib/adminApi.js.
+// download them — see src/context/AuthContext.jsx and src/features/recipes/recipesApi.js.
 import { initializeApp } from "firebase/app";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 

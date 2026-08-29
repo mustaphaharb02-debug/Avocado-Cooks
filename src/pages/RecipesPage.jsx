@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import RecipeCard from '../components/RecipeCard'
-import { useLang } from '../context/LanguageContext'
-import { useRecipes } from '../context/RecipesContext'
+import RecipeCard from '../features/recipes/RecipeCard'
+import { useLang } from '../i18n/LanguageContext'
+import { categoryNames } from '../i18n/translations'
+import { useRecipes } from '../features/recipes/RecipesContext'
 import './RecipesPage.css'
 
 export default function RecipesPage() {
@@ -28,12 +29,9 @@ export default function RecipesPage() {
     })
   }, [recipes, lang, search, category])
 
-  // Arabic labels for the categories that have one; anything a new recipe
-  // introduces simply shows its own name.
-  const catLabel = isRTL ? {
-    All: 'الكل', Chicken: 'دجاج', Vegetarian: 'نباتي', Soup: 'شوربة', Pastry: 'معجنات',
-    Pasta: 'باستا', Salad: 'سلطة', Dessert: 'حلويات', Breakfast: 'فطور', Seafood: 'مأكولات بحرية',
-  } : {}
+  // Categories are typed in English on each recipe; their Arabic names
+  // live with the rest of the translations.
+  const catLabel = isRTL ? categoryNames.ar : {}
 
   return (
     <main className="recipes-page" dir={isRTL ? 'rtl' : 'ltr'}>
