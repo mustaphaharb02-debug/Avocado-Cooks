@@ -49,12 +49,35 @@ The list inside the rules is what actually protects the data, so the two must
 match — an address in the first but not the second gets a dashboard where
 every save fails.
 
-### 3. (Optional) Enable photo uploads
+### 3. (Optional) Turn on photo uploads
 
-Firebase Console → **Storage → Get started**, then paste
-[`storage.rules`](storage.rules) into **Storage → Rules** and publish.
-If Storage is not enabled, the dashboard still works — you just paste an image
-link instead of uploading a file.
+Without this the dashboard still works — you paste an image link, or a path
+like `/images/my-dish.jpg`, which is how all the built-in recipes work. Two
+ways to get a real upload button:
+
+**Cloudinary** — no Firebase billing needed, and the browser uploads straight
+to it. In Cloudinary: **Settings → Upload → Upload presets → Add**, set
+**Signing Mode** to **Unsigned**, and restrict it (a folder, allowed formats,
+a max file size). Then create a `.env` file with:
+
+```
+VITE_CLOUDINARY_CLOUD_NAME=your-cloud-name
+VITE_CLOUDINARY_UPLOAD_PRESET=your-unsigned-preset
+```
+
+Never put the Cloudinary **API secret** anywhere in this project. Everything
+starting with `VITE_` is published to every visitor's browser. An unsigned
+preset is the only kind a site without a server can use, and it means anyone
+reading the site's code could upload to that preset — so keep it narrow, and
+don't reuse a preset from another project.
+
+**Firebase Storage** — used automatically when the Cloudinary variables are
+empty. Firebase Console → **Storage → Get started**, then paste
+[`storage.rules`](storage.rules) into **Storage → Rules** and publish. Note
+that creating a Storage bucket now requires the Blaze plan; Blaze still has a
+free tier, so a site this size costs nothing, but it does need a card on file.
+
+Whichever is active, the editor says so under the upload button.
 
 ---
 

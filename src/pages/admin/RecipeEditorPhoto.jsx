@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-import { uploadRecipeImage, uploadErrorMessage } from '../../features/recipes/recipesApi'
+import { imageHost, uploadRecipeImage, uploadErrorMessage } from '../../features/recipes/recipesApi'
 
 /**
  * The photo half of the recipe form: upload a file, or paste a link.
@@ -78,6 +78,12 @@ export default function RecipeEditorPhoto({ image, suggestions, error, onChange,
               ))}
             </datalist>
           </label>
+
+          <span className="admin-field__hint">
+            {imageHost() === 'cloudinary'
+              ? 'Uploads go to Cloudinary.'
+              : 'Uploads go to Firebase Storage. If that is not enabled on the project, paste a link instead.'}
+          </span>
 
           {uploadError && <p className="admin-alert admin-alert--warn">{uploadError}</p>}
           {error && <span className="admin-field__error">{error}</span>}
