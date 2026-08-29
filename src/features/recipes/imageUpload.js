@@ -22,8 +22,9 @@ import { app, usingEmulators } from '../../firebase'
 //  Cloudinary API SECRET must never appear here; it would be published
 //  to every visitor. An unsigned preset is a deliberate trade: anyone
 //  who reads the site's JavaScript could upload to that preset, so lock
-//  it down in Cloudinary (a fixed folder, allowed formats, a max file
-//  size) and keep it separate from any preset you use elsewhere.
+//  it down in Cloudinary — set the folder on the preset itself, allow
+//  only image formats, cap the file size — and keep it separate from
+//  any preset used by another project.
 // =====================================================================
 
 export const IMAGE_MAX_BYTES = 5 * 1024 * 1024
@@ -31,7 +32,6 @@ export const IMAGE_MAX_BYTES = 5 * 1024 * 1024
 const env = import.meta.env
 const CLOUDINARY_CLOUD = env.VITE_CLOUDINARY_CLOUD_NAME || ''
 const CLOUDINARY_PRESET = env.VITE_CLOUDINARY_UPLOAD_PRESET || ''
-const CLOUDINARY_FOLDER = env.VITE_CLOUDINARY_FOLDER || 'avo-cooks'
 
 /** Which host uploads will go to: 'cloudinary', 'firebase', or 'none'. */
 export function imageHost() {
@@ -53,7 +53,9 @@ async function uploadToCloudinary(file) {
   const form = new FormData()
   form.append('file', file)
   form.append('upload_preset', CLOUDINARY_PRESET)
-  if (CLOUDINARY_FOLDER) form.append('folder', CLOUDINARY_FOLDER)
+  // The folder is set ON the preset, not sent from here. That works the
+  // same whether the account uses classic or dynamic folders, and it
+  // means nobody using the preset can choose where files land.
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
