@@ -33,3 +33,7 @@ pnpm-debug.log*
 firebase-debug.log*
 firestore-debug.log*
 .firebase/
+
+# Vite writes these while restarting the dev server
+vite.config.js.timestamp-*
+vite.config.*.timestamp-*
