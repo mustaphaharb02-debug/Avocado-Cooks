@@ -37,7 +37,7 @@ if (usingEmulators) {
 // Who may open the admin dashboard. Keep this list in sync with the
 // isAdmin() e-mail list inside firestore.rules and storage.rules —
 // this one only hides the UI, the rules are what actually protect data.
-export const ADMIN_EMAILS = (env.VITE_ADMIN_EMAILS || "mustapha.harb02@gmail.com")
+export const ADMIN_EMAILS = (env.VITE_ADMIN_EMAILS || "mounahareb@gmail.com")
   .split(",")
   .map((e) => e.trim().toLowerCase())
   .filter(Boolean);

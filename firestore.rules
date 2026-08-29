@@ -24,7 +24,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null
              && request.auth.token.email.lower() in [
-                  'mustapha.harb02@gmail.com'
+                  'mounahareb@gmail.com'
                 ];
     }
 

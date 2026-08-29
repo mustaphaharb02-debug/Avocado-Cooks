@@ -129,7 +129,7 @@ npm run dev:emulated
 Create a test admin in the Auth emulator first:
 
 ```bash
-curl -X POST "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=any" -H "Content-Type: application/json" -d "{\"email\":\"mustapha.harb02@gmail.com\",\"password\":\"whatever\",\"returnSecureToken\":true}"
+curl -X POST "http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=any" -H "Content-Type: application/json" -d "{\"email\":\"mounahareb@gmail.com\",\"password\":\"whatever\",\"returnSecureToken\":true}"
 ```
 
 Nothing here touches the real project: `.env.emulated` only applies to

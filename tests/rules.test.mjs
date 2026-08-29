@@ -31,7 +31,7 @@ import {
 } from 'firebase/firestore'
 import { ref, uploadBytes, getBytes, deleteObject } from 'firebase/storage'
 
-const ADMIN_EMAIL = 'mustapha.harb02@gmail.com'
+const ADMIN_EMAIL = 'mounahareb@gmail.com'
 
 const testEnv = await initializeTestEnvironment({
   projectId: 'avo-cooks',
