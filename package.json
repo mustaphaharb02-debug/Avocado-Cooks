@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "dev:emulated": "vite --mode emulated",
     "emulators": "firebase emulators:start --only auth,firestore,storage,hosting",
-    "test:rules": "node tests/rules.test.mjs"
+    "test:rules": "node tests/rules.test.mjs",
+    "seed:emulator": "node tests/seedEmulator.mjs"
   },
   "dependencies": {
     "firebase": "^12.13.0",

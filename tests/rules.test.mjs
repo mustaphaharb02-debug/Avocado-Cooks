@@ -31,6 +31,8 @@ import {
 } from 'firebase/firestore'
 import { ref, uploadBytes, getBytes, deleteObject } from 'firebase/storage'
 
+import seedEmulator from './seedEmulator.mjs'
+
 const ADMIN_EMAIL = 'mounahareb@gmail.com'
 
 const testEnv = await initializeTestEnvironment({
@@ -389,24 +391,19 @@ await check('the app list matches the rules', () => {
 
 await testEnv.cleanup()
 
-// initializeTestEnvironment replaced the emulator's rules with the ones it
-// loaded, and cleanup does not put them back — leaving the emulator denying
-// everything, which looks exactly like a broken app. Restore them so
-// `npm run dev:emulated` still works straight after a test run.
-for (const [port, file] of [
-  [8080, 'firestore.rules'],
-  [9199, 'storage.rules'],
-]) {
-  const url =
-    port === 8080
-      ? `http://127.0.0.1:8080/emulator/v1/projects/avo-cooks:securityRules`
-      : `http://127.0.0.1:9199/internal/setRules`
-  await fetch(url, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ rules: { files: [{ name: file, content: readFileSync(file, 'utf8') }] } }),
-  }).catch(() => {})
-}
+// Put the emulator back the way a developer expects to find it.
+//
+// Two things need undoing. initializeTestEnvironment replaced the
+// emulator's rules with the ones it loaded, and cleanup does not restore
+// them — leaving the emulator refusing everything, which looks exactly
+// like a broken app. And these tests start from an empty database, so
+// the recipes are gone and only the dummy fixtures remain — which looks
+// exactly like every recipe was deleted.
+//
+// seedEmulator() fixes both: it reloads the real rules files and puts the
+// built-in recipes back.
+await seedEmulator({ quiet: true })
+console.log('\n  emulator restored: rules reloaded, recipes seeded')
 
 console.log(`\n${'-'.repeat(58)}`)
 console.log(`  ${passed} passed, ${failures.length} failed`)
