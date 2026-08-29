@@ -163,6 +163,25 @@ export default function CommentSection({ recipeId }) {
                 <p className="comment-item__text">
                   {c.text}
                 </p>
+
+                {/* Mona's reply, when she has written one */}
+                {c.reply && (
+                  <div className="comment-reply">
+                    <div className="comment-reply__head">
+                      <span className="comment-reply__badge">🥑</span>
+                      <strong className="comment-reply__who">{t.replyFrom}</strong>
+                      {c.repliedAt?.toDate && (
+                        <span className="comment-reply__date">
+                          {c.repliedAt.toDate().toLocaleDateString(
+                            isRTL ? 'ar-EG' : 'en-GB',
+                            { year: 'numeric', month: 'short', day: 'numeric' }
+                          )}
+                        </span>
+                      )}
+                    </div>
+                    <p className="comment-reply__text">{c.reply}</p>
+                  </div>
+                )}
               </div>
             </div>
           ))

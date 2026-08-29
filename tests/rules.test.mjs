@@ -27,6 +27,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  deleteField,
   Timestamp,
 } from 'firebase/firestore'
 import { ref, uploadBytes, getBytes, deleteObject } from 'firebase/storage'
@@ -227,6 +228,76 @@ await check('nobody can edit a comment, not even an admin', () =>
 
 await check('a visitor cannot delete a comment', () =>
   assertFails(deleteDoc(doc(anonDb, 'recipes/1/comments/seeded')))
+)
+
+group('comment replies — the owner answers, without rewriting anyone')
+
+await check('an admin can reply to a comment', () =>
+  assertSucceeds(
+    updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), {
+      reply: 'Thank you! Glad it worked.',
+      repliedAt: serverTimestamp(),
+    })
+  )
+)
+
+await check('a visitor cannot reply', () =>
+  assertFails(
+    updateDoc(doc(anonDb, 'recipes/1/comments/seeded'), {
+      reply: 'I am not the owner',
+      repliedAt: serverTimestamp(),
+    })
+  )
+)
+
+await check('a signed-in non-admin cannot reply', () =>
+  assertFails(
+    updateDoc(doc(strangerDb, 'recipes/1/comments/seeded'), {
+      reply: 'still not the owner',
+      repliedAt: serverTimestamp(),
+    })
+  )
+)
+
+await check('an admin cannot rewrite what the visitor said while replying', () =>
+  assertFails(
+    updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), {
+      text: 'words the visitor never wrote',
+      reply: 'nice',
+      repliedAt: serverTimestamp(),
+    })
+  )
+)
+
+await check('an admin cannot change the commenter name', () =>
+  assertFails(updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), { name: 'Someone Else' }))
+)
+
+await check('a back-dated reply is refused', () =>
+  assertFails(
+    updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), {
+      reply: 'pretending this was ages ago',
+      repliedAt: Timestamp.fromDate(new Date('2020-01-01')),
+    })
+  )
+)
+
+await check('a reply longer than 1000 characters is refused', () =>
+  assertFails(
+    updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), {
+      reply: 'x'.repeat(1001),
+      repliedAt: serverTimestamp(),
+    })
+  )
+)
+
+await check('an admin can remove a reply again', () =>
+  assertSucceeds(
+    updateDoc(doc(adminDb, 'recipes/1/comments/seeded'), {
+      reply: deleteField(),
+      repliedAt: deleteField(),
+    })
+  )
 )
 
 await check('an admin can delete a comment (moderation)', () =>

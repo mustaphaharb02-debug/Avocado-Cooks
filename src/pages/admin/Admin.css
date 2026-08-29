@@ -640,3 +640,52 @@
     max-width: none;
   }
 }
+
+/* ---------------------------------------------------------------
+   Replying to a comment
+   --------------------------------------------------------------- */
+.admin-comment__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-comment__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.admin-reply {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--green-mist);
+  border-inline-start: 3px solid var(--green-soft);
+  border-radius: var(--radius-sm);
+}
+
+.admin-reply--editing {
+  background: var(--beige);
+  border-inline-start-color: var(--yellow-warm);
+}
+
+.admin-reply__label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 4px;
+}
+
+.admin-reply p {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  white-space: pre-wrap;
+}
+
+.admin-reply__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}

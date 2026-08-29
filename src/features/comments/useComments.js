@@ -9,12 +9,15 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
+  deleteField,
 } from 'firebase/firestore'
 
 import { db } from '../../firebase'
 
 export const NAME_MAX = 50
 export const TEXT_MAX = 1000
+export const REPLY_MAX = 1000
 
 /** Comments for one recipe, stored at recipes/{recipeId}/comments. */
 export default function useComments(recipeId) {
@@ -63,6 +66,27 @@ export default function useComments(recipeId) {
     [recipeId]
   )
 
+  /**
+   * Admin-only: attach a reply to a comment, or clear it again by
+   * passing an empty string. The security rules let an admin change the
+   * reply and nothing else, so the visitor's own words are safe.
+   */
+  const replyToComment = useCallback(
+    async (commentId, replyText) => {
+      if (!recipeId || !commentId) return
+      const reply = String(replyText ?? '').trim().slice(0, REPLY_MAX)
+      const ref = doc(db, 'recipes', String(recipeId), 'comments', commentId)
+
+      await updateDoc(
+        ref,
+        reply
+          ? { reply, repliedAt: serverTimestamp() }
+          : { reply: deleteField(), repliedAt: deleteField() }
+      )
+    },
+    [recipeId]
+  )
+
   /** Admin-only (allowed by the security rules); used for moderation. */
   const deleteComment = useCallback(
     async (commentId) => {
@@ -72,5 +96,5 @@ export default function useComments(recipeId) {
     [recipeId]
   )
 
-  return { comments, addComment, deleteComment, loading, error }
+  return { comments, addComment, replyToComment, deleteComment, loading, error }
 }

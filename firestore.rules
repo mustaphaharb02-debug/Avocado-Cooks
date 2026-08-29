@@ -63,6 +63,24 @@ service cloud.firestore {
              && request.resource.data.createdAt == request.time;
     }
 
+    // The owner may attach a reply to a comment, and nothing else. The
+    // visitor's own name, text and timestamp must survive untouched —
+    // otherwise "reply" would quietly become "edit what they said".
+    function isReplyEdit() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['reply', 'repliedAt'])
+             && (
+                  // clearing the reply again is fine
+                  !('reply' in request.resource.data)
+                  || (
+                       request.resource.data.reply is string
+                       && request.resource.data.reply.size() > 0
+                       && request.resource.data.reply.size() <= 1000
+                       && request.resource.data.repliedAt == request.time
+                     )
+                );
+    }
+
     // -----------------------------------------------------------------
     //  RECIPES — visitors see published recipes only, admins see all.
     //
@@ -76,13 +94,18 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
 
       // ---------------------------------------------------------------
-      //  COMMENTS — anyone can read and post on a visible recipe,
-      //  nobody can edit, only an admin can delete (moderation).
+      //  COMMENTS — anyone can read and post on a visible recipe.
+      //  Nobody can change what a visitor wrote; an admin can reply to
+      //  a comment or delete it.
       // ---------------------------------------------------------------
       match /comments/{commentId} {
         allow read: if true;
         allow create: if isValidComment() && recipeIsPublic(recipeId);
-        allow update: if false;
+
+        // Visitors can never change a comment. An admin may only add,
+        // change or remove the reply on one.
+        allow update: if isAdmin() && isReplyEdit();
+
         allow delete: if isAdmin();
       }
     }
